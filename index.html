@@ -471,7 +471,6 @@ body { font-family: 'Nunito', sans-serif; background: #D4DCF0; display: flex; ju
 .btn-green { width:100%; padding:10px; background:var(--shared); color:white; border:none; border-radius:10px; font-size:12px; font-weight:800; cursor:pointer; font-family:'Nunito',sans-serif; margin-top:8px; }
 .btn-red { width:100%; padding:10px; background:white; color:#EF4444; border:1px solid #FECACA; border-radius:10px; font-size:12px; font-weight:800; cursor:pointer; font-family:'Nunito',sans-serif; margin-top:6px; }
 .btn-blue { width:100%; padding:10px; background:var(--papa-light); color:var(--papa); border:1px solid var(--papa-mid); border-radius:10px; font-size:12px; font-weight:800; cursor:pointer; font-family:'Nunito',sans-serif; margin-top:6px; }
-</style>
 .jug-step { display:flex; flex-direction:column; align-items:center; gap:2px; font-size:12px; font-weight:800; color:rgba(255,255,255,0.4); min-width:0; }
 .jug-step span { font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.3px; white-space:nowrap; }
 .jug-step.active { color:white; }
@@ -2167,7 +2166,7 @@ if(typeof supabase !== 'undefined') {
 } else {
   hideLoading();
 }
-</script>
+
   paint=p;
   document.querySelectorAll('.who-btn').forEach(b=>{b.className=b.id==='wb-'+p?'who-btn act '+p:'who-btn '+b.id.replace('wb-','');});
 }
