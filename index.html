@@ -2506,8 +2506,13 @@ async function doLogout(){
   showAuth();
 }
 
-// Start
-document.addEventListener('DOMContentLoaded',()=>sbSetup());
+// Start — retry until Supabase lib is loaded
+function waitForSupabase(n){
+  if(typeof supabase!=='undefined'){sbSetup();}
+  else if(n>0){setTimeout(()=>waitForSupabase(n-1),300);}
+  else{hideLoading();}
+}
+setTimeout(()=>waitForSupabase(20), 100);
 </script>
 </body>
 </html>
