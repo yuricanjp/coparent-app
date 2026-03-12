@@ -2147,6 +2147,7 @@ async function startAnalysis(){
 }
 
 async function callClaudeForJugement(pdfBase64){
+  const jugPrompt = 'Tu es un assistant specialise en droit de la famille francais. Analyse ce jugement et extrais les informations au format JSON strict: {"modele":"alternee|residence_principale|223|custom","parent_residant":"papa|maman","jours_papa":[],"jours_maman":[],"heure_remise_debut":"","lieu_remise":"","heure_remise_fin":"","vacances":{"noel_paires":"papa|maman","noel_impaires":"papa|maman","ete_paires":"papa|maman","ete_impaires":"papa|maman"},"pension_alimentaire":"","notes":""}. Si absent mets null. Retourne UNIQUEMENT le JSON.';
   const response = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -2156,46 +2157,10 @@ async function callClaudeForJugement(pdfBase64){
       messages: [{
         role: 'user',
         content: [
-          {
-            type: 'document',
-            source: { type: 'base64', media_type: 'application/pdf', data: pdfBase64 }
-          },
-          {
-            type: 'text',
-            text: `Tu es un assistant spécialisé en droit de la famille français. Analyse ce jugement de divorce ou convention de garde et extrais UNIQUEMENT les informations suivantes au format JSON strict (sans aucun texte avant ou après) :
-{
-  "modele": "alternee|residence_principale|223|custom",
-  "parent_residant": "papa|maman|null",
-  "jours_papa": ["Lundi","Mercredi",...],
-  "jours_maman": ["Mardi","Jeudi",...],
-  "heure_remise_debut": "ex: Vendredi 18h00",
-  "lieu_remise": "ex: École primaire Jules Ferry",
-  "heure_remise_fin": "ex: Lundi 8h30",
-  "vacances": {
-    "toussaint_paires": "papa|maman|alternee",
-    "toussaint_premiere_sem_paires": "papa|maman",
-    "noel_paires": "papa|maman|alternee",
-    "noel_24_31_paires": "papa|maman",
-    "hiver_paires": "papa|maman|alternee",
-    "printemps_paires": "papa|maman|alternee",
-    "ete_paires": "papa|maman|alternee",
-    "ete_premiere_moitie_paires": "papa|maman",
-    "toussaint_impaires": "papa|maman|alternee",
-    "noel_impaires": "papa|maman|alternee",
-    "noel_24_31_impaires": "papa|maman",
-    "hiver_impaires": "papa|maman|alternee",
-    "printemps_impaires": "papa|maman|alternee",
-    "ete_impaires": "papa|maman|alternee",
-    "ete_premiere_moitie_impaires": "papa|maman"
-  },
-  "exceptions": ["ex: Fête des mères → Maman", "ex: Fête des pères → Papa"],
-  "pension_alimentaire": "ex: 350€/mois versée par le père",
-  "notes": "autres dispositions importantes"
-}
-Si une information est absente du document, mets null. Ne retourne QUE le JSON.`
-          }
+          { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: pdfBase64 } },
+          { type: 'text', text: jugPrompt }
         ]
-      })
+      }]
     })
   });
   const data = await response.json();
