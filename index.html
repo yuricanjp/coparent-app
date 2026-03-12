@@ -2436,12 +2436,22 @@ async function sbLogin(){
   err.style.display='none';
   if(!email||!pwd){err.textContent='Remplissez tous les champs.';err.style.display='block';return;}
   btn.disabled=true;btn.textContent='Connexion…';
-  const {data,error}=await sb.auth.signInWithPassword({email,password:pwd});
+  try{
+    const r=await sbSignIn(email,pwd);
+    if(!r.ok||!r.data?.access_token){
+      err.textContent='Email ou mot de passe incorrect.';err.style.display='block';
+      btn.disabled=false;btn.textContent='Se connecter';return;
+    }
+    r.data.expires_at=Math.floor(Date.now()/1000)+r.data.expires_in;
+    localStorage.setItem('sb_session',JSON.stringify(r.data));
+    sbToken=r.data.access_token;
+    sbUser={id:r.data.user.id,email:r.data.user.email,user_metadata:r.data.user.user_metadata||{}};
+    sbHideAuth();
+    await sbLoadUser();
+  }catch(e){
+    err.textContent='Erreur réseau.';err.style.display='block';
+  }
   btn.disabled=false;btn.textContent='Se connecter';
-  if(error){err.textContent='Email ou mot de passe incorrect.';err.style.display='block';return;}
-  sbUser=data.user;
-  sbHideAuth();
-  await sbLoadUser();
 }
 
 // --- Register ---
@@ -2453,54 +2463,76 @@ async function sbRegister(){
   const err=document.getElementById('sb-reg-err');
   const btn=document.getElementById('sb-reg-btn');
   err.style.display='none';
-  if(!sbRole){err.textContent='Choisissez votre rôle (père ou mère).';err.style.display='block';return;}
+  if(!sbRole){err.textContent='Choisissez votre rôle.';err.style.display='block';return;}
   if(!prenom||!email||!pwd){err.textContent='Remplissez tous les champs.';err.style.display='block';return;}
   if(pwd.length<6){err.textContent='Mot de passe trop court (6 min).';err.style.display='block';return;}
   btn.disabled=true;btn.textContent='Création…';
-  const {data,error}=await sb.auth.signUp({email,password:pwd,options:{data:{prenom,role:sbRole}}});
-  btn.disabled=false;btn.textContent='Créer mon compte';
-  if(error){err.textContent=error.message;err.style.display='block';return;}
-  sbUser=data.user;
-  // Upsert profil
-  await sb.from('profils').upsert({id:sbUser.id,email,prenom,role:sbRole});
-  // Cherche code invitation
-  let enfant=null;
-  if(code){
-    const {data:ef}=await sb.from('enfants').select('*').eq('invite_code',code).maybeSingle();
-    if(ef){
-      await sb.from('enfants').update({autre_parent_id:sbUser.id,autre_parent_prenom:prenom}).eq('id',ef.id);
-      enfant={...ef,autre_parent_id:sbUser.id,autre_parent_prenom:prenom};
+  try{
+    const r=await sbSignUp(email,pwd,{prenom,role:sbRole});
+    if(!r.ok && r.status!==200){
+      err.textContent=r.data?.msg||r.data?.message||'Erreur création compte.';
+      err.style.display='block';btn.disabled=false;btn.textContent='Créer mon compte';return;
     }
+    const lr=await sbSignIn(email,pwd);
+    if(lr.ok&&lr.data?.access_token){
+      lr.data.expires_at=Math.floor(Date.now()/1000)+lr.data.expires_in;
+      localStorage.setItem('sb_session',JSON.stringify(lr.data));
+      sbToken=lr.data.access_token;
+      sbUser={id:lr.data.user.id,email,user_metadata:{prenom,role:sbRole}};
+    } else if(r.data?.id){
+      sbUser={id:r.data.id,email,user_metadata:{prenom,role:sbRole}};
+    }
+    if(!sbUser){err.textContent='Compte créé. Connectez-vous.';err.style.display='block';sbTabSwitch('login');btn.disabled=false;btn.textContent='Créer mon compte';return;}
+    await sbQuery('profils','','POST',{id:sbUser.id,email,prenom,role:sbRole});
+    let enfant=null;
+    if(code){
+      const ef=await sbQuery('enfants','invite_code=eq.'+code+'&limit=1');
+      if(ef.ok&&ef.data?.length){
+        await sbQuery('enfants','id=eq.'+ef.data[0].id,'PATCH',{autre_parent_id:sbUser.id,autre_parent_prenom:prenom});
+        enfant={...ef.data[0],autre_parent_id:sbUser.id,autre_parent_prenom:prenom};
+      }
+    }
+    if(!enfant){
+      const inv=Math.random().toString(36).substring(2,8).toUpperCase();
+      const headers={'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+(sbToken||SB_KEY),'Prefer':'return=representation'};
+      const nr=await fetch(SB_URL+'/rest/v1/enfants',{method:'POST',headers,body:JSON.stringify({parent_id:sbUser.id,prenom:'',nom:'',zone:'B',garde_modele:'alternee',invite_code:inv})});
+      const nd=await nr.json();
+      enfant=Array.isArray(nd)?nd[0]:nd;
+    }
+    sbEnfant=enfant;
+    sbProfil={id:sbUser.id,email,prenom,role:sbRole};
+    sbHideAuth();
+    sbApplyUI();
+  }catch(e){
+    err.textContent='Erreur réseau.';err.style.display='block';
   }
-  if(!enfant){
-    const inv=Math.random().toString(36).substring(2,8).toUpperCase();
-    const {data:ne}=await sb.from('enfants').insert({parent_id:sbUser.id,prenom:'',nom:'',zone:'B',garde_modele:'alternee',invite_code:inv}).select().single();
-    enfant=ne;
-  }
-  sbEnfant=enfant;
-  sbProfil={id:sbUser.id,email,prenom,role:sbRole};
-  sbHideAuth();
-  sbApplyUI();
+  btn.disabled=false;btn.textContent='Créer mon compte';
 }
 
 // --- Load user ---
 async function sbLoadUser(){
   try{
-    const {data:p}=await sb.from('profils').select('*').eq('id',sbUser.id).maybeSingle();
-    if(p){sbProfil=p;}
+    const pr=await sbQuery('profils','id=eq.'+sbUser.id+'&limit=1');
+    if(pr.ok&&pr.data?.length){sbProfil=pr.data[0];}
     else{
       const m=sbUser.user_metadata||{};
       const np={id:sbUser.id,email:sbUser.email,prenom:m.prenom||'Parent',role:m.role||'papa'};
-      await sb.from('profils').upsert(np);
+      await sbQuery('profils','','POST',np);
       sbProfil=np;
     }
-    // Cherche enfant
-    let{data:ef}=await sb.from('enfants').select('*').eq('parent_id',sbUser.id).maybeSingle();
-    if(!ef){const{data:ef2}=await sb.from('enfants').select('*').eq('autre_parent_id',sbUser.id).maybeSingle();ef=ef2;}
+    let ef=null;
+    const er=await sbQuery('enfants','parent_id=eq.'+sbUser.id+'&limit=1');
+    if(er.ok&&er.data?.length) ef=er.data[0];
+    if(!ef){
+      const er2=await sbQuery('enfants','autre_parent_id=eq.'+sbUser.id+'&limit=1');
+      if(er2.ok&&er2.data?.length) ef=er2.data[0];
+    }
     if(!ef){
       const inv=Math.random().toString(36).substring(2,8).toUpperCase();
-      const{data:ne}=await sb.from('enfants').insert({parent_id:sbUser.id,prenom:'',nom:'',zone:'B',garde_modele:'alternee',invite_code:inv}).select().single();
-      ef=ne;
+      const headers={'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+(sbToken||SB_KEY),'Prefer':'return=representation'};
+      const nr=await fetch(SB_URL+'/rest/v1/enfants',{method:'POST',headers,body:JSON.stringify({parent_id:sbUser.id,prenom:'',nom:'',zone:'B',garde_modele:'alternee',invite_code:inv})});
+      const nd=await nr.json();
+      ef=Array.isArray(nd)?nd[0]:nd;
     }
     sbEnfant=ef;
   }catch(e){console.error('sbLoadUser:',e);}
@@ -2545,7 +2577,7 @@ function spClose(){document.getElementById('sb-profil').style.display='none';}
 async function spSave(){
   const prenom=document.getElementById('sp-prenom').value.trim();
   if(!prenom||!sbUser)return;
-  await sb.from('profils').update({prenom}).eq('id',sbUser.id);
+  await sbQuery('profils','id=eq.'+sbUser.id,'PATCH',{prenom});
   sbProfil.prenom=prenom;sbApplyUI();showToast('✅ Profil sauvegardé');spClose();
 }
 async function spSaveEnfant(){
@@ -2553,7 +2585,7 @@ async function spSaveEnfant(){
   const prenom=document.getElementById('sp-enf-prenom').value.trim();
   const naissance=document.getElementById('sp-enf-dob').value;
   const zone=document.getElementById('sp-enf-zone').value;
-  await sb.from('enfants').update({prenom,naissance,zone,updated_at:new Date().toISOString()}).eq('id',sbEnfant.id);
+  await sbQuery('enfants','id=eq.'+sbEnfant.id,'PATCH',{prenom,naissance,zone});
   sbEnfant={...sbEnfant,prenom,naissance,zone};
   showToast('✅ Enfant sauvegardé');
 }
