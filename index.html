@@ -4,58 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>CoParent</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Baloo+2:wght@600;700;800&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<style>
-/* AUTH OVERLAY */
-#authOverlay{position:fixed;inset:0;z-index:9999;background:linear-gradient(135deg,#1E3A8A 0%,#4F46E5 50%,#EC4899 100%);display:none;align-items:center;justify-content:center;padding:20px}
-.auth-card{background:white;border-radius:24px;padding:28px 24px;width:100%;max-width:360px;box-shadow:0 30px 80px rgba(0,0,0,0.4);animation:slideUp 0.4s ease}
-@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
-.auth-logo-wrap{text-align:center;margin-bottom:20px}
-.auth-logo-icon{width:60px;height:60px;background:linear-gradient(135deg,#3B82F6,#EC4899);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 8px}
-.auth-app-name{font-family:'Playfair Display',serif;font-size:24px;color:#1E293B}
-.auth-app-sub{font-size:11px;color:#64748B;font-weight:600}
-.auth-tabs{display:flex;background:#F8FAFC;border-radius:10px;padding:3px;margin-bottom:18px}
-.auth-tab-btn{flex:1;padding:7px;border-radius:8px;font-size:12px;font-weight:800;border:none;background:transparent;color:#64748B;cursor:pointer;font-family:'Nunito',sans-serif;transition:all 0.2s}
-.auth-tab-btn.active{background:white;color:#6366F1;box-shadow:0 2px 8px rgba(0,0,0,0.1)}
-.auth-field{margin-bottom:12px}
-.auth-label{font-size:10px;font-weight:800;color:#64748B;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px}
-.auth-input{width:100%;background:#F8FAFC;border:1.5px solid #E2E8F0;border-radius:10px;padding:10px 12px;font-size:13px;font-family:'Nunito',sans-serif;outline:none;color:#1E293B;transition:border-color 0.2s}
-.auth-input:focus{border-color:#6366F1}
-.auth-btn{width:100%;padding:12px;background:linear-gradient(135deg,#4F46E5,#6366F1);color:white;border:none;border-radius:11px;font-size:13px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;margin-top:6px;transition:all 0.2s}
-.auth-btn:disabled{opacity:0.5;cursor:not-allowed}
-.auth-err{background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;padding:8px 10px;font-size:11px;color:#DC2626;font-weight:700;margin-top:8px;display:none}
-.role-row{display:flex;gap:8px;margin-bottom:12px}
-.role-pick{flex:1;padding:10px 6px;border:2px solid #E2E8F0;border-radius:10px;text-align:center;cursor:pointer;transition:all 0.2s;font-family:'Nunito',sans-serif;background:white}
-.role-pick.p{border-color:#3B82F6;background:#EFF6FF}
-.role-pick.m{border-color:#EC4899;background:#FDF2F8}
-.role-emoji{font-size:20px;display:block}
-.role-lbl{font-size:10px;font-weight:800;color:#64748B}
-#loadingScreen{position:fixed;inset:0;background:linear-gradient(135deg,#1E3A8A,#4F46E5);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:10000}
-.ls-logo{font-size:52px;margin-bottom:12px}
-.ls-title{font-family:'Playfair Display',serif;font-size:26px;color:white}
-.ls-spinner{width:32px;height:32px;border:3px solid rgba(255,255,255,0.2);border-top:3px solid white;border-radius:50%;animation:lspin 1s linear infinite;margin-top:20px}
-@keyframes lspin{to{transform:rotate(360deg)}}
-#inviteBanner{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#1E3A8A,#4F46E5);color:white;border-radius:16px;padding:12px 16px;width:calc(100% - 40px);max-width:360px;z-index:500;box-shadow:0 8px 32px rgba(79,70,229,0.4);display:none}
-.invite-code{font-size:22px;font-weight:900;letter-spacing:4px;text-align:center;padding:8px;background:rgba(255,255,255,0.15);border-radius:10px;margin:8px 0;font-family:monospace}
-#profilOverlay{position:absolute;inset:0;background:#F8FAFC;z-index:100;display:none;flex-direction:column;overflow-y:auto}
-.pov-hero{background:linear-gradient(135deg,#6366F1,#8B5CF6);padding:20px 18px}
-.pov-av{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:900;color:white;border:3px solid rgba(255,255,255,0.4);margin-bottom:8px}
-.pov-nm{font-size:17px;font-weight:900;color:white}
-.pov-rl{font-size:11px;color:rgba(255,255,255,0.8);font-weight:700}
-.pov-body{padding:14px}
-.pov-sec{background:white;border-radius:14px;padding:14px;margin-bottom:10px;border:1px solid #E2E8F0;box-shadow:0 2px 8px rgba(0,0,0,0.04)}
-.pov-sec-title{font-size:10px;font-weight:900;color:#64748B;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
-.pov-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #F1F5F9}
-.pov-row:last-child{border-bottom:none}
-.pov-ico{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
-.pov-lbl{font-size:10px;font-weight:700;color:#64748B}
-.pov-val{font-size:12px;font-weight:800;color:#1E293B}
-.pi{width:100%;border:none;background:transparent;font-size:12px;font-weight:800;color:#1E293B;font-family:'Nunito',sans-serif;outline:none}
-.btn-g{width:100%;padding:10px;background:#10B981;color:white;border:none;border-radius:10px;font-size:12px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;margin-top:8px}
-.btn-r{width:100%;padding:10px;background:white;color:#EF4444;border:1px solid #FECACA;border-radius:10px;font-size:12px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;margin-top:6px}
-.btn-b{width:100%;padding:10px;background:#EFF6FF;color:#3B82F6;border:1px solid #BFDBFE;border-radius:10px;font-size:12px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;margin-top:6px}
-</style>
 <style>
 :root {
   --papa: #3B82F6; --papa-light: #EFF6FF; --papa-mid: #BFDBFE;
@@ -479,54 +429,112 @@ body { font-family: 'Nunito', sans-serif; background: #D4DCF0; display: flex; ju
 </style>
 </head>
 <body>
+<style>
+#sb-loading{position:fixed;inset:0;background:linear-gradient(135deg,#1E3A8A,#4F46E5);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999}
+#sb-loading .ico{font-size:52px;margin-bottom:12px}
+#sb-loading .tit{font-family:'Playfair Display',serif;font-size:26px;color:white;margin-bottom:20px}
+#sb-loading .spin{width:32px;height:32px;border:3px solid rgba(255,255,255,0.2);border-top:3px solid white;border-radius:50%;animation:sbspin 1s linear infinite}
+@keyframes sbspin{to{transform:rotate(360deg)}}
+#sb-auth{position:fixed;inset:0;background:linear-gradient(135deg,#1E3A8A,#4F46E5);display:none;align-items:center;justify-content:center;padding:20px;z-index:9998}
+.sb-card{background:white;border-radius:24px;padding:28px 24px;width:100%;max-width:360px;box-shadow:0 30px 80px rgba(0,0,0,0.4)}
+.sb-logo{text-align:center;margin-bottom:20px}
+.sb-logo-ico{width:64px;height:64px;background:linear-gradient(135deg,#3B82F6,#EC4899);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:30px;margin:0 auto 10px}
+.sb-app-name{font-family:'Playfair Display',serif;font-size:26px;color:#1E293B}
+.sb-app-sub{font-size:11px;color:#64748B;font-weight:600;margin-top:2px}
+.sb-tabs{display:flex;background:#F1F5F9;border-radius:10px;padding:3px;margin-bottom:18px}
+.sb-tab{flex:1;padding:8px;border-radius:8px;font-size:12px;font-weight:800;border:none;background:transparent;color:#64748B;cursor:pointer;font-family:'Nunito',sans-serif}
+.sb-tab.on{background:white;color:#4F46E5;box-shadow:0 2px 8px rgba(0,0,0,0.1)}
+.sb-lbl{font-size:10px;font-weight:800;color:#64748B;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px}
+.sb-inp{width:100%;background:#F8FAFC;border:1.5px solid #E2E8F0;border-radius:10px;padding:10px 12px;font-size:13px;font-family:'Nunito',sans-serif;outline:none;color:#1E293B;margin-bottom:12px;box-sizing:border-box}
+.sb-inp:focus{border-color:#4F46E5}
+.sb-btn{width:100%;padding:12px;background:linear-gradient(135deg,#4F46E5,#6366F1);color:white;border:none;border-radius:11px;font-size:13px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;margin-top:4px}
+.sb-btn:disabled{opacity:0.5;cursor:not-allowed}
+.sb-err{background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;padding:8px 10px;font-size:11px;color:#DC2626;font-weight:700;margin-top:8px;display:none}
+.role-row{display:flex;gap:8px;margin-bottom:12px}
+.role-btn{flex:1;padding:10px 6px;border:2px solid #E2E8F0;border-radius:10px;text-align:center;cursor:pointer;background:white;font-family:'Nunito',sans-serif;transition:all 0.15s}
+.role-btn.sel-p{border-color:#3B82F6;background:#EFF6FF}
+.role-btn.sel-m{border-color:#EC4899;background:#FDF2F8}
+.role-btn .re{font-size:22px;display:block;margin-bottom:2px}
+.role-btn .rl{font-size:10px;font-weight:800;color:#64748B}
+#sb-invite{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#1E3A8A,#4F46E5);color:white;border-radius:16px;padding:14px 18px;width:calc(100% - 40px);max-width:360px;z-index:500;box-shadow:0 8px 32px rgba(79,70,229,0.4);display:none;text-align:center}
+#sb-invite .inv-code{font-size:28px;font-weight:900;letter-spacing:6px;font-family:monospace;background:rgba(255,255,255,0.15);border-radius:10px;padding:8px;margin:8px 0}
+#sb-invite .inv-sub{font-size:10px;color:rgba(255,255,255,0.75);font-weight:600}
+#sb-invite .inv-close{position:absolute;top:8px;right:12px;background:none;border:none;color:white;font-size:20px;cursor:pointer;line-height:1}
+#sb-profil{position:absolute;inset:0;background:#F8FAFC;z-index:200;display:none;flex-direction:column;overflow:hidden}
+.sp-hero{background:linear-gradient(135deg,#4F46E5,#8B5CF6);padding:20px 18px;flex-shrink:0}
+.sp-av{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:white;border:3px solid rgba(255,255,255,0.35);margin-bottom:8px}
+.sp-nm{font-size:18px;font-weight:900;color:white}
+.sp-rl{font-size:11px;color:rgba(255,255,255,0.75);font-weight:700}
+.sp-body{padding:14px;overflow-y:auto;flex:1}
+.sp-sec{background:white;border-radius:14px;padding:14px;margin-bottom:10px;border:1px solid #E2E8F0}
+.sp-sec-t{font-size:10px;font-weight:900;color:#94A3B8;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+.sp-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #F1F5F9}
+.sp-row:last-child{border-bottom:none}
+.sp-ico{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.sp-lbl{font-size:10px;font-weight:700;color:#94A3B8}
+.sp-val{font-size:12px;font-weight:800;color:#1E293B}
+.spi{width:100%;border:none;background:transparent;font-size:12px;font-weight:800;color:#1E293B;font-family:'Nunito',sans-serif;outline:none}
+.sp-btn-g{width:100%;padding:10px;background:#10B981;color:white;border:none;border-radius:10px;font-size:12px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;margin-top:8px}
+.sp-btn-b{width:100%;padding:10px;background:#EFF6FF;color:#3B82F6;border:1px solid #BFDBFE;border-radius:10px;font-size:12px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;margin-top:6px}
+.sp-btn-r{width:100%;padding:10px;background:white;color:#EF4444;border:1px solid #FECACA;border-radius:10px;font-size:12px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;margin-top:6px}
+</style>
+
 <!-- LOADING -->
-<div id="loadingScreen"><div class="ls-logo">👨‍👩‍👧</div><div class="ls-title">CoParent</div><div class="ls-spinner"></div></div>
+<div id="sb-loading">
+  <div class="ico">👨‍👩‍👧</div>
+  <div class="tit">CoParent</div>
+  <div class="spin"></div>
+</div>
 
 <!-- AUTH -->
-<div id="authOverlay">
-  <div class="auth-card">
-    <div class="auth-logo-wrap">
-      <div class="auth-logo-icon">👨‍👩‍👧</div>
-      <div class="auth-app-name">CoParent</div>
-      <div class="auth-app-sub">La co-parentalité simplifiée</div>
+<div id="sb-auth">
+  <div class="sb-card">
+    <div class="sb-logo">
+      <div class="sb-logo-ico">👨‍👩‍👧</div>
+      <div class="sb-app-name">CoParent</div>
+      <div class="sb-app-sub">La co-parentalité simplifiée</div>
     </div>
-    <div class="auth-tabs">
-      <button class="auth-tab-btn active" onclick="authTab('login')">Connexion</button>
-      <button class="auth-tab-btn" onclick="authTab('register')">Créer un compte</button>
+    <div class="sb-tabs">
+      <button class="sb-tab on" id="sb-tab-login" onclick="sbTabSwitch('login')">Connexion</button>
+      <button class="sb-tab" id="sb-tab-register" onclick="sbTabSwitch('register')">Créer un compte</button>
     </div>
-    <div id="authLogin">
-      <div class="auth-field"><label class="auth-label">Email</label><input type="email" class="auth-input" id="aLoginEmail" placeholder="votre@email.fr"></div>
-      <div class="auth-field"><label class="auth-label">Mot de passe</label><input type="password" class="auth-input" id="aLoginPwd" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
-      <button class="auth-btn" id="loginBtn" onclick="doLogin()">Se connecter</button>
-      <div class="auth-err" id="loginErr"></div>
+    <!-- LOGIN -->
+    <div id="sb-panel-login">
+      <label class="sb-lbl">Email</label>
+      <input type="email" class="sb-inp" id="sb-email" placeholder="votre@email.fr">
+      <label class="sb-lbl">Mot de passe</label>
+      <input type="password" class="sb-inp" id="sb-pwd" placeholder="••••••••" onkeydown="if(event.key==='Enter')sbLogin()">
+      <button class="sb-btn" id="sb-login-btn" onclick="sbLogin()">Se connecter</button>
+      <div class="sb-err" id="sb-login-err"></div>
     </div>
-    <div id="authRegister" style="display:none">
-      <div class="auth-field"><label class="auth-label">Vous êtes</label>
-        <div class="role-row">
-          <div class="role-pick" id="rPapa" onclick="pickRole('papa')"><span class="role-emoji">👨</span><span class="role-lbl">Le père</span></div>
-          <div class="role-pick" id="rMama" onclick="pickRole('mama')"><span class="role-emoji">👩</span><span class="role-lbl">La mère</span></div>
-        </div>
+    <!-- REGISTER -->
+    <div id="sb-panel-register" style="display:none">
+      <label class="sb-lbl">Vous êtes</label>
+      <div class="role-row">
+        <div class="role-btn" id="rb-papa" onclick="sbPickRole('papa')"><span class="re">👨</span><span class="rl">Le père</span></div>
+        <div class="role-btn" id="rb-mama" onclick="sbPickRole('mama')"><span class="re">👩</span><span class="rl">La mère</span></div>
       </div>
-      <div class="auth-field"><label class="auth-label">Votre prénom</label><input type="text" class="auth-input" id="aRegPrenom" placeholder="Jean-Philippe"></div>
-      <div class="auth-field"><label class="auth-label">Email</label><input type="email" class="auth-input" id="aRegEmail" placeholder="votre@email.fr"></div>
-      <div class="auth-field"><label class="auth-label">Mot de passe</label><input type="password" class="auth-input" id="aRegPwd" placeholder="8 caractères minimum"></div>
-      <div class="auth-field">
-        <label class="auth-label">Code d'invitation (optionnel)</label>
-        <input type="text" class="auth-input" id="aRegCode" placeholder="Ex: ABC123" style="letter-spacing:3px;text-transform:uppercase">
-        <div style="font-size:10px;color:#64748B;margin-top:3px;font-weight:600">Laissez vide si l'autre parent n'a pas encore de compte</div>
-      </div>
-      <button class="auth-btn" id="registerBtn" onclick="doRegister()">Créer mon compte</button>
-      <div class="auth-err" id="registerErr"></div>
+      <label class="sb-lbl">Prénom</label>
+      <input type="text" class="sb-inp" id="sb-prenom" placeholder="Jean-Philippe">
+      <label class="sb-lbl">Email</label>
+      <input type="email" class="sb-inp" id="sb-reg-email" placeholder="votre@email.fr">
+      <label class="sb-lbl">Mot de passe</label>
+      <input type="password" class="sb-inp" id="sb-reg-pwd" placeholder="6 caractères minimum">
+      <label class="sb-lbl">Code invitation <span style="font-weight:600;text-transform:none">(optionnel)</span></label>
+      <input type="text" class="sb-inp" id="sb-code" placeholder="Ex: ABC123" style="letter-spacing:3px;text-transform:uppercase">
+      <div style="font-size:10px;color:#94A3B8;margin-top:-8px;margin-bottom:10px;font-weight:600">Laissez vide si l'autre parent n'a pas encore de compte</div>
+      <button class="sb-btn" id="sb-reg-btn" onclick="sbRegister()">Créer mon compte</button>
+      <div class="sb-err" id="sb-reg-err"></div>
     </div>
   </div>
 </div>
 
 <!-- INVITE BANNER -->
-<div id="inviteBanner">
-  <button onclick="document.getElementById('inviteBanner').style.display='none'" style="position:absolute;top:10px;right:12px;background:none;border:none;color:white;font-size:18px;cursor:pointer">×</button>
-  <div style="font-size:12px;font-weight:900;margin-bottom:4px">📲 Invitez l'autre parent</div>
-  <div class="invite-code" id="inviteCode">——</div>
-  <div style="font-size:10px;color:rgba(255,255,255,0.75);font-weight:600;text-align:center">Partagez ce code à l'autre parent pour rejoindre votre espace</div>
+<div id="sb-invite">
+  <button class="inv-close" onclick="document.getElementById('sb-invite').style.display='none'">×</button>
+  <div style="font-size:12px;font-weight:900;margin-bottom:2px">📲 Code d'invitation</div>
+  <div class="inv-code" id="sb-invite-code">——</div>
+  <div class="inv-sub">Partagez ce code à l'autre parent pour rejoindre votre espace CoParent</div>
 </div>
 
 <!-- Mode switcher -->
@@ -549,43 +557,47 @@ body { font-family: 'Nunito', sans-serif; background: #D4DCF0; display: flex; ju
         <span class="app-name">CoParent</span>
       </div>
       <div style="display:flex;align-items:center;gap:6px">
-        <div style="display:flex"><div class="avatar papa" id="hdrAv1">JP</div><div class="avatar mama" id="hdrAv2">M</div></div>
+        <div style="display:flex"><div class="avatar papa" id="hdr-av1">JP</div><div class="avatar mama" id="hdr-av2">M</div></div>
         <div class="badge-notif">4</div>
-        <div onclick="openProfil()" style="cursor:pointer;font-size:16px;margin-left:2px">⚙️</div>
+        <span onclick="spOpen()" style="font-size:16px;cursor:pointer;margin-left:2px">⚙️</span>
       </div>
     </div>
   </div>
 
   <!-- PROFIL OVERLAY -->
-  <div id="profilOverlay" style="display:none;flex-direction:column">
-    <div class="pov-hero">
-      <button onclick="closeProfil()" style="background:rgba(255,255,255,0.2);border:none;border-radius:50%;width:28px;height:28px;color:white;font-size:13px;cursor:pointer;margin-bottom:10px">←</button>
-      <div class="pov-av" id="povAv">JP</div>
-      <div class="pov-nm" id="povName">Jean-Philippe</div>
-      <div class="pov-rl" id="povRole">👨 Père</div>
+  <div id="sb-profil">
+    <div class="sp-hero">
+      <button onclick="spClose()" style="background:rgba(255,255,255,0.2);border:none;border-radius:50%;width:28px;height:28px;color:white;font-size:14px;cursor:pointer;margin-bottom:10px;display:flex;align-items:center;justify-content:center">←</button>
+      <div class="sp-av" id="sp-av">JP</div>
+      <div class="sp-nm" id="sp-nm">—</div>
+      <div class="sp-rl" id="sp-rl">—</div>
     </div>
-    <div class="pov-body" style="overflow-y:auto;flex:1">
-      <div class="pov-sec">
-        <div class="pov-sec-title">Mon profil</div>
-        <div class="pov-row"><div class="pov-ico" style="background:#EFF6FF">👤</div><div style="flex:1"><div class="pov-lbl">Prénom</div><input class="pi" id="povPrenom" placeholder="Prénom"></div></div>
-        <div class="pov-row"><div class="pov-ico" style="background:#F0FDF4">📧</div><div style="flex:1"><div class="pov-lbl">Email</div><div class="pov-val" id="povEmail">—</div></div></div>
-        <div class="pov-row"><div class="pov-ico" style="background:#F5F3FF">👤</div><div style="flex:1"><div class="pov-lbl">Rôle</div><div class="pov-val" id="povRoleVal">—</div></div></div>
-        <button class="btn-g" onclick="saveProfil()">💾 Sauvegarder</button>
+    <div class="sp-body">
+      <div class="sp-sec">
+        <div class="sp-sec-t">Mon profil</div>
+        <div class="sp-row"><div class="sp-ico" style="background:#EFF6FF">👤</div><div style="flex:1"><div class="sp-lbl">Prénom</div><input class="spi" id="sp-prenom" placeholder="Prénom"></div></div>
+        <div class="sp-row"><div class="sp-ico" style="background:#F0FDF4">📧</div><div style="flex:1"><div class="sp-lbl">Email</div><div class="sp-val" id="sp-email">—</div></div></div>
+        <div class="sp-row"><div class="sp-ico" style="background:#F5F3FF">🏷️</div><div style="flex:1"><div class="sp-lbl">Rôle</div><div class="sp-val" id="sp-role">—</div></div></div>
+        <button class="sp-btn-g" onclick="spSave()">💾 Sauvegarder</button>
       </div>
-      <div class="pov-sec">
-        <div class="pov-sec-title">Enfant</div>
-        <div class="pov-row"><div class="pov-ico" style="background:#FFFBEB">🧒</div><div style="flex:1"><div class="pov-lbl">Prénom</div><input class="pi" id="povEnfantPrenom" placeholder="Prénom" onchange="saveEnfantProfil()"></div></div>
-        <div class="pov-row"><div class="pov-ico" style="background:#FFFBEB">📅</div><div style="flex:1"><div class="pov-lbl">Naissance</div><input type="date" class="pi" id="povEnfantNaissance" onchange="saveEnfantProfil()"></div></div>
-        <div class="pov-row"><div class="pov-ico" style="background:#FFFBEB">🏫</div><div style="flex:1"><div class="pov-lbl">Zone scolaire</div><select class="pi" id="povEnfantZone" onchange="saveEnfantProfil()" style="border:none;background:transparent;font-family:'Nunito',sans-serif"><option value="A">Zone A</option><option value="B" selected>Zone B</option><option value="C">Zone C</option></select></div></div>
+      <div class="sp-sec">
+        <div class="sp-sec-t">Enfant</div>
+        <div class="sp-row"><div class="sp-ico" style="background:#FFFBEB">🧒</div><div style="flex:1"><div class="sp-lbl">Prénom</div><input class="spi" id="sp-enf-prenom" placeholder="Prénom de l'enfant" onchange="spSaveEnfant()"></div></div>
+        <div class="sp-row"><div class="sp-ico" style="background:#FFFBEB">📅</div><div style="flex:1"><div class="sp-lbl">Date de naissance</div><input type="date" class="spi" id="sp-enf-dob" onchange="spSaveEnfant()"></div></div>
+        <div class="sp-row"><div class="sp-ico" style="background:#FFFBEB">🏫</div><div style="flex:1"><div class="sp-lbl">Zone scolaire</div>
+          <select class="spi" id="sp-enf-zone" onchange="spSaveEnfant()" style="border:none;background:transparent;font-family:'Nunito',sans-serif">
+            <option value="A">Zone A</option><option value="B" selected>Zone B</option><option value="C">Zone C</option>
+          </select>
+        </div></div>
       </div>
-      <div class="pov-sec">
-        <div class="pov-sec-title">Autre parent</div>
-        <div class="pov-row"><div class="pov-ico" style="background:#FDF2F8">👥</div><div style="flex:1"><div class="pov-lbl">Statut</div><div class="pov-val" id="povAutreStatus">En attente</div></div></div>
-        <button class="btn-b" onclick="showInviteCode()">📲 Code d'invitation</button>
+      <div class="sp-sec">
+        <div class="sp-sec-t">Autre parent</div>
+        <div class="sp-row"><div class="sp-ico" style="background:#FDF2F8">👥</div><div style="flex:1"><div class="sp-lbl">Statut</div><div class="sp-val" id="sp-autre-status">⏳ En attente</div></div></div>
+        <button class="sp-btn-b" onclick="spShowInvite()">📲 Code d'invitation</button>
       </div>
-      <div class="pov-sec">
-        <div class="pov-sec-title">Compte</div>
-        <button class="btn-r" onclick="doLogout()">🚪 Se déconnecter</button>
+      <div class="sp-sec">
+        <div class="sp-sec-t">Compte</div>
+        <button class="sp-btn-r" onclick="spLogout()">🚪 Se déconnecter</button>
       </div>
     </div>
   </div>
@@ -2352,172 +2364,201 @@ function applyJugementToApp(){
     `;
   }
 }
+</script>
 
-// ===== SUPABASE =====
-const SUPA_URL='https://acwozhheidsjelchmnuq.supabase.co';
-const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFjd296aGhlaWRzamVsY2htbnVxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2NDIwMzQsImV4cCI6MjA4ODIxODAzNH0.7s-bOJKcaFY4Mfl3yPpdDf38g-vF0T4aiQbXJta3GXM';
-let sb,sbUser=null,sbProfil=null,sbEnfant=null,authRole=null;
+<script>
+// ============================================================
+// SUPABASE AUTH & DATA
+// ============================================================
+const SB_URL='https://acwozhheidsjelchmnuq.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFjd296aGhlaWRzamVsY2htbnVxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2NDIwMzQsImV4cCI6MjA4ODIxODAzNH0.7s-bOJKcaFY4Mfl3yPpdDf38g-vF0T4aiQbXJta3GXM';
+let sb=null, sbUser=null, sbProfil=null, sbEnfant=null, sbRole=null;
 
-function sbSetup(){
-  if(typeof supabase==='undefined'){hideLoading();return;}
-  try{
-    sb=supabase.createClient(SUPA_URL,SUPA_KEY);
-    // Timeout de secours : si rien ne répond en 5s, affiche l'auth
-    const fallback=setTimeout(()=>{hideLoading();showAuth();},5000);
-    sb.auth.getSession().then(({data:{session}})=>{
-      clearTimeout(fallback);
-      if(session){sbUser=session.user;sbLoadUser();}
-      else{hideLoading();showAuth();}
-    }).catch(()=>{clearTimeout(fallback);hideLoading();showAuth();});
-  }catch(e){hideLoading();showAuth();}
+// --- Init ---
+function sbInit(){
+  sb=supabase.createClient(SB_URL,SB_KEY);
+  const fallback=setTimeout(()=>{sbHideLoading();sbShowAuth();},6000);
+  sb.auth.getSession().then(({data:{session}})=>{
+    clearTimeout(fallback);
+    if(session){sbUser=session.user;sbLoadUser();}
+    else{sbHideLoading();sbShowAuth();}
+  }).catch(()=>{clearTimeout(fallback);sbHideLoading();sbShowAuth();});
 }
 
-function hideLoading(){const el=document.getElementById('loadingScreen');if(el)el.style.display='none';}
-function showAuth(){const el=document.getElementById('authOverlay');if(el)el.style.display='flex';}
-function hideAuth(){const el=document.getElementById('authOverlay');if(el)el.style.display='none';}
+function sbHideLoading(){const el=document.getElementById('sb-loading');if(el)el.style.display='none';}
+function sbShowAuth(){const el=document.getElementById('sb-auth');if(el)el.style.display='flex';}
+function sbHideAuth(){const el=document.getElementById('sb-auth');if(el)el.style.display='none';}
 
-function authTab(t){
-  document.getElementById('authLogin').style.display=t==='login'?'block':'none';
-  document.getElementById('authRegister').style.display=t==='register'?'block':'none';
-  document.querySelectorAll('.auth-tab-btn').forEach((b,i)=>b.classList.toggle('active',(i===0&&t==='login')||(i===1&&t==='register')));
-}
-function pickRole(r){
-  authRole=r;
-  document.getElementById('rPapa').className='role-pick'+(r==='papa'?' p':'');
-  document.getElementById('rMama').className='role-pick'+(r==='mama'?' m':'');
+// --- Tab switch ---
+function sbTabSwitch(t){
+  document.getElementById('sb-panel-login').style.display=t==='login'?'block':'none';
+  document.getElementById('sb-panel-register').style.display=t==='register'?'block':'none';
+  document.getElementById('sb-tab-login').className='sb-tab'+(t==='login'?' on':'');
+  document.getElementById('sb-tab-register').className='sb-tab'+(t==='register'?' on':'');
 }
 
-async function doLogin(){
-  const email=document.getElementById('aLoginEmail').value.trim();
-  const pwd=document.getElementById('aLoginPwd').value;
-  const err=document.getElementById('loginErr');
-  const btn=document.getElementById('loginBtn');
+// --- Pick role ---
+function sbPickRole(r){
+  sbRole=r;
+  document.getElementById('rb-papa').className='role-btn'+(r==='papa'?' sel-p':'');
+  document.getElementById('rb-mama').className='role-btn'+(r==='mama'?' sel-m':'');
+}
+
+// --- Login ---
+async function sbLogin(){
+  const email=document.getElementById('sb-email').value.trim();
+  const pwd=document.getElementById('sb-pwd').value;
+  const err=document.getElementById('sb-login-err');
+  const btn=document.getElementById('sb-login-btn');
   err.style.display='none';
   if(!email||!pwd){err.textContent='Remplissez tous les champs.';err.style.display='block';return;}
   btn.disabled=true;btn.textContent='Connexion…';
   const {data,error}=await sb.auth.signInWithPassword({email,password:pwd});
-  if(error){err.textContent='Email ou mot de passe incorrect.';err.style.display='block';btn.disabled=false;btn.textContent='Se connecter';return;}
+  btn.disabled=false;btn.textContent='Se connecter';
+  if(error){err.textContent='Email ou mot de passe incorrect.';err.style.display='block';return;}
   sbUser=data.user;
+  sbHideAuth();
   await sbLoadUser();
 }
 
-async function doRegister(){
-  const prenom=document.getElementById('aRegPrenom').value.trim();
-  const email=document.getElementById('aRegEmail').value.trim();
-  const pwd=document.getElementById('aRegPwd').value;
-  const code=document.getElementById('aRegCode').value.trim().toUpperCase();
-  const err=document.getElementById('registerErr');
-  const btn=document.getElementById('registerBtn');
+// --- Register ---
+async function sbRegister(){
+  const prenom=document.getElementById('sb-prenom').value.trim();
+  const email=document.getElementById('sb-reg-email').value.trim();
+  const pwd=document.getElementById('sb-reg-pwd').value;
+  const code=document.getElementById('sb-code').value.trim().toUpperCase();
+  const err=document.getElementById('sb-reg-err');
+  const btn=document.getElementById('sb-reg-btn');
   err.style.display='none';
-  if(!authRole){err.textContent='Choisissez votre rôle.';err.style.display='block';return;}
+  if(!sbRole){err.textContent='Choisissez votre rôle (père ou mère).';err.style.display='block';return;}
   if(!prenom||!email||!pwd){err.textContent='Remplissez tous les champs.';err.style.display='block';return;}
   if(pwd.length<6){err.textContent='Mot de passe trop court (6 min).';err.style.display='block';return;}
   btn.disabled=true;btn.textContent='Création…';
-  const {data,error}=await sb.auth.signUp({email,password:pwd,options:{data:{prenom,role:authRole}}});
-  if(error){err.textContent=error.message;err.style.display='block';btn.disabled=false;btn.textContent='Créer mon compte';return;}
+  const {data,error}=await sb.auth.signUp({email,password:pwd,options:{data:{prenom,role:sbRole}}});
+  btn.disabled=false;btn.textContent='Créer mon compte';
+  if(error){err.textContent=error.message;err.style.display='block';return;}
   sbUser=data.user;
-  await sb.from('profils').upsert({id:sbUser.id,email,prenom,role:authRole});
-  const invCode=Math.random().toString(36).substring(2,8).toUpperCase();
+  // Upsert profil
+  await sb.from('profils').upsert({id:sbUser.id,email,prenom,role:sbRole});
+  // Cherche code invitation
   let enfant=null;
   if(code){
-    const {data:ef}=await sb.from('enfants').select('*').eq('invite_code',code).single();
-    if(ef){await sb.from('enfants').update({autre_parent_id:sbUser.id,autre_parent_prenom:prenom}).eq('id',ef.id);enfant={...ef,autre_parent_id:sbUser.id};}
+    const {data:ef}=await sb.from('enfants').select('*').eq('invite_code',code).maybeSingle();
+    if(ef){
+      await sb.from('enfants').update({autre_parent_id:sbUser.id,autre_parent_prenom:prenom}).eq('id',ef.id);
+      enfant={...ef,autre_parent_id:sbUser.id,autre_parent_prenom:prenom};
+    }
   }
   if(!enfant){
-    const {data:ne}=await sb.from('enfants').insert({parent_id:sbUser.id,prenom:'',nom:'',zone:'B',garde_modele:'alternee',invite_code:invCode}).select().single();
+    const inv=Math.random().toString(36).substring(2,8).toUpperCase();
+    const {data:ne}=await sb.from('enfants').insert({parent_id:sbUser.id,prenom:'',nom:'',zone:'B',garde_modele:'alternee',invite_code:inv}).select().single();
     enfant=ne;
   }
   sbEnfant=enfant;
-  sbProfil={id:sbUser.id,email,prenom,role:authRole};
-  btn.disabled=false;btn.textContent='Créer mon compte';
-  hideAuth();sbApplyToUI();
+  sbProfil={id:sbUser.id,email,prenom,role:sbRole};
+  sbHideAuth();
+  sbApplyUI();
 }
 
+// --- Load user ---
 async function sbLoadUser(){
   try{
-    let{data:profil}=await sb.from('profils').select('*').eq('id',sbUser.id).single();
-    if(!profil){
-      const meta=sbUser.user_metadata||{};
-      await sb.from('profils').upsert({id:sbUser.id,email:sbUser.email,prenom:meta.prenom||'Parent',role:meta.role||'papa'});
-      profil={id:sbUser.id,email:sbUser.email,prenom:meta.prenom||'Parent',role:meta.role||'papa'};
+    const {data:p}=await sb.from('profils').select('*').eq('id',sbUser.id).maybeSingle();
+    if(p){sbProfil=p;}
+    else{
+      const m=sbUser.user_metadata||{};
+      const np={id:sbUser.id,email:sbUser.email,prenom:m.prenom||'Parent',role:m.role||'papa'};
+      await sb.from('profils').upsert(np);
+      sbProfil=np;
     }
-    sbProfil=profil;
-    let{data:enfant}=await sb.from('enfants').select('*').eq('parent_id',sbUser.id).single();
-    if(!enfant){const{data:e2}=await sb.from('enfants').select('*').eq('autre_parent_id',sbUser.id).single();enfant=e2;}
-    if(!enfant){
+    // Cherche enfant
+    let{data:ef}=await sb.from('enfants').select('*').eq('parent_id',sbUser.id).maybeSingle();
+    if(!ef){const{data:ef2}=await sb.from('enfants').select('*').eq('autre_parent_id',sbUser.id).maybeSingle();ef=ef2;}
+    if(!ef){
       const inv=Math.random().toString(36).substring(2,8).toUpperCase();
       const{data:ne}=await sb.from('enfants').insert({parent_id:sbUser.id,prenom:'',nom:'',zone:'B',garde_modele:'alternee',invite_code:inv}).select().single();
-      enfant=ne;
+      ef=ne;
     }
-    sbEnfant=enfant;
-  }catch(e){console.error('sbLoadUser error',e);}
-  hideLoading();hideAuth();sbApplyToUI();
+    sbEnfant=ef;
+  }catch(e){console.error('sbLoadUser:',e);}
+  sbApplyUI();
 }
 
-function sbApplyToUI(){
+// --- Apply to UI ---
+function sbApplyUI(){
   if(!sbProfil)return;
   const isPapa=sbProfil.role==='papa';
   const prenom=sbProfil.prenom||'Parent';
-  const initial=prenom[0]?.toUpperCase()||'?';
-  const av1=document.getElementById('hdrAv1');
-  const av2=document.getElementById('hdrAv2');
-  if(av1){av1.textContent=initial;av1.className='avatar '+(isPapa?'papa':'mama');}
-  const autrePrenom=sbEnfant?.autre_parent_prenom||(isPapa?'Maman':'Papa');
-  if(av2){av2.textContent=autrePrenom[0]?.toUpperCase()||'?';av2.className='avatar '+(isPapa?'mama':'papa');}
+  const ini=(prenom[0]||'?').toUpperCase();
+  // Header avatars
+  const a1=document.getElementById('hdr-av1');
+  const a2=document.getElementById('hdr-av2');
+  if(a1){a1.textContent=ini;a1.className='avatar '+(isPapa?'papa':'mama');}
+  const autreP=sbEnfant?.autre_parent_prenom||(isPapa?'Maman':'Papa');
+  if(a2){a2.textContent=(autreP[0]||'?').toUpperCase();a2.className='avatar '+(isPapa?'mama':'papa');}
+  // Mode switcher label
   const btns=document.querySelectorAll('.mode-btn');
   if(btns[0])btns[0].textContent=(isPapa?'👨 ':'👩 ')+prenom;
-  document.getElementById('povAv').textContent=initial;
-  document.getElementById('povName').textContent=prenom;
-  document.getElementById('povRole').textContent=isPapa?'👨 Père':'👩 Mère';
-  document.getElementById('povEmail').textContent=sbProfil.email||'';
-  document.getElementById('povRoleVal').textContent=isPapa?'Père':'Mère';
-  document.getElementById('povPrenom').value=prenom;
+  // Profil overlay
+  document.getElementById('sp-av').textContent=ini;
+  document.getElementById('sp-nm').textContent=prenom;
+  document.getElementById('sp-rl').textContent=isPapa?'👨 Père':'👩 Mère';
+  document.getElementById('sp-email').textContent=sbProfil.email||'';
+  document.getElementById('sp-role').textContent=isPapa?'Père':'Mère';
+  document.getElementById('sp-prenom').value=prenom;
   if(sbEnfant){
-    document.getElementById('povEnfantPrenom').value=sbEnfant.prenom||'';
-    if(sbEnfant.naissance)document.getElementById('povEnfantNaissance').value=sbEnfant.naissance;
-    document.getElementById('povEnfantZone').value=sbEnfant.zone||'B';
-    document.getElementById('povAutreStatus').textContent=sbEnfant.autre_parent_id?('✅ Connecté — '+(sbEnfant.autre_parent_prenom||'Autre parent')):'⏳ En attente';
+    document.getElementById('sp-enf-prenom').value=sbEnfant.prenom||'';
+    if(sbEnfant.naissance)document.getElementById('sp-enf-dob').value=sbEnfant.naissance;
+    document.getElementById('sp-enf-zone').value=sbEnfant.zone||'B';
+    document.getElementById('sp-autre-status').textContent=
+      sbEnfant.autre_parent_id?('✅ '+( sbEnfant.autre_parent_prenom||'Connecté')):'⏳ En attente d\'invitation';
   }
   showToast('👋 Bonjour '+prenom+' !');
 }
 
-function openProfil(){const ov=document.getElementById('profilOverlay');ov.style.display='flex';}
-function closeProfil(){document.getElementById('profilOverlay').style.display='none';}
-
-async function saveProfil(){
-  const prenom=document.getElementById('povPrenom').value.trim();
+// --- Profil overlay ---
+function spOpen(){const el=document.getElementById('sb-profil');el.style.display='flex';}
+function spClose(){document.getElementById('sb-profil').style.display='none';}
+async function spSave(){
+  const prenom=document.getElementById('sp-prenom').value.trim();
   if(!prenom||!sbUser)return;
   await sb.from('profils').update({prenom}).eq('id',sbUser.id);
-  sbProfil.prenom=prenom;sbApplyToUI();showToast('✅ Profil sauvegardé');closeProfil();
+  sbProfil.prenom=prenom;sbApplyUI();showToast('✅ Profil sauvegardé');spClose();
 }
-async function saveEnfantProfil(){
+async function spSaveEnfant(){
   if(!sbEnfant)return;
-  const prenom=document.getElementById('povEnfantPrenom').value.trim();
-  const naissance=document.getElementById('povEnfantNaissance').value;
-  const zone=document.getElementById('povEnfantZone').value;
-  await sb.from('enfants').update({prenom,naissance,zone}).eq('id',sbEnfant.id);
-  sbEnfant={...sbEnfant,prenom,naissance,zone};showToast('✅ Enfant sauvegardé');
+  const prenom=document.getElementById('sp-enf-prenom').value.trim();
+  const naissance=document.getElementById('sp-enf-dob').value;
+  const zone=document.getElementById('sp-enf-zone').value;
+  await sb.from('enfants').update({prenom,naissance,zone,updated_at:new Date().toISOString()}).eq('id',sbEnfant.id);
+  sbEnfant={...sbEnfant,prenom,naissance,zone};
+  showToast('✅ Enfant sauvegardé');
 }
-function showInviteCode(){
+function spShowInvite(){
   if(!sbEnfant?.invite_code)return;
-  document.getElementById('inviteCode').textContent=sbEnfant.invite_code;
-  document.getElementById('inviteBanner').style.display='block';
-  closeProfil();
+  document.getElementById('sb-invite-code').textContent=sbEnfant.invite_code;
+  document.getElementById('sb-invite').style.display='block';
+  spClose();
 }
-async function doLogout(){
+async function spLogout(){
   await sb.auth.signOut();
   sbUser=null;sbProfil=null;sbEnfant=null;
-  document.getElementById('profilOverlay').style.display='none';
-  showAuth();
+  document.getElementById('sb-profil').style.display='none';
+  sbShowAuth();
 }
 
-// Start — retry until Supabase lib is loaded
-function waitForSupabase(n){
-  if(typeof supabase!=='undefined'){sbSetup();}
-  else if(n>0){setTimeout(()=>waitForSupabase(n-1),300);}
-  else{hideLoading();}
+// --- Start ---
+if(typeof supabase!=='undefined'){
+  sbInit();
+}else{
+  // Retry si le CDN est lent
+  let attempts=0;
+  const t=setInterval(()=>{
+    attempts++;
+    if(typeof supabase!=='undefined'){clearInterval(t);sbInit();}
+    else if(attempts>15){clearInterval(t);sbHideLoading();sbShowAuth();}
+  },400);
 }
-setTimeout(()=>waitForSupabase(20), 100);
 </script>
 </body>
 </html>
