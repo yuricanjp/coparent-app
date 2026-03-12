@@ -573,32 +573,80 @@ body { font-family: 'Nunito', sans-serif; background: #D4DCF0; display: flex; ju
       <div class="sp-rl" id="sp-rl">—</div>
     </div>
     <div class="sp-body">
+
+      <!-- MON PROFIL -->
       <div class="sp-sec">
         <div class="sp-sec-t">Mon profil</div>
         <div class="sp-row"><div class="sp-ico" style="background:#EFF6FF">👤</div><div style="flex:1"><div class="sp-lbl">Prénom</div><input class="spi" id="sp-prenom" placeholder="Prénom"></div></div>
         <div class="sp-row"><div class="sp-ico" style="background:#F0FDF4">📧</div><div style="flex:1"><div class="sp-lbl">Email</div><div class="sp-val" id="sp-email">—</div></div></div>
         <div class="sp-row"><div class="sp-ico" style="background:#F5F3FF">🏷️</div><div style="flex:1"><div class="sp-lbl">Rôle</div><div class="sp-val" id="sp-role">—</div></div></div>
-        <button class="sp-btn-g" onclick="spSave()">💾 Sauvegarder</button>
+        <button class="sp-btn-g" onclick="spSave()">💾 Sauvegarder mon profil</button>
       </div>
+
+      <!-- ENFANT -->
       <div class="sp-sec">
         <div class="sp-sec-t">Enfant</div>
-        <div class="sp-row"><div class="sp-ico" style="background:#FFFBEB">🧒</div><div style="flex:1"><div class="sp-lbl">Prénom</div><input class="spi" id="sp-enf-prenom" placeholder="Prénom de l'enfant" onchange="spSaveEnfant()"></div></div>
-        <div class="sp-row"><div class="sp-ico" style="background:#FFFBEB">📅</div><div style="flex:1"><div class="sp-lbl">Date de naissance</div><input type="date" class="spi" id="sp-enf-dob" onchange="spSaveEnfant()"></div></div>
+        <div class="sp-row"><div class="sp-ico" style="background:#FFFBEB">🧒</div><div style="flex:1"><div class="sp-lbl">Prénom</div><input class="spi" id="sp-enf-prenom" placeholder="Prénom de l'enfant"></div></div>
+        <div class="sp-row"><div class="sp-ico" style="background:#FFFBEB">👨‍👩‍👧</div><div style="flex:1"><div class="sp-lbl">Nom de famille</div><input class="spi" id="sp-enf-nom" placeholder="Nom de famille"></div></div>
+        <div class="sp-row"><div class="sp-ico" style="background:#FFFBEB">📅</div><div style="flex:1"><div class="sp-lbl">Date de naissance</div><input type="date" class="spi" id="sp-enf-dob"></div></div>
         <div class="sp-row"><div class="sp-ico" style="background:#FFFBEB">🏫</div><div style="flex:1"><div class="sp-lbl">Zone scolaire</div>
-          <select class="spi" id="sp-enf-zone" onchange="spSaveEnfant()" style="border:none;background:transparent;font-family:'Nunito',sans-serif">
-            <option value="A">Zone A</option><option value="B" selected>Zone B</option><option value="C">Zone C</option>
+          <select class="spi" id="sp-enf-zone" style="border:none;background:transparent;font-family:'Nunito',sans-serif">
+            <option value="A">Zone A — Lyon, Nantes, Toulouse...</option>
+            <option value="B">Zone B — Marseille, Lille, Strasbourg...</option>
+            <option value="C">Zone C — Paris, Bordeaux, Versailles...</option>
           </select>
         </div></div>
+        <button class="sp-btn-g" onclick="spSaveEnfant()">💾 Sauvegarder enfant</button>
       </div>
+
+      <!-- GARDE -->
+      <div class="sp-sec">
+        <div class="sp-sec-t">Organisation de la garde</div>
+        <div class="sp-row"><div class="sp-ico" style="background:#F0FDF4">🛡️</div><div style="flex:1"><div class="sp-lbl">Modèle de garde</div>
+          <select class="spi" id="sp-garde-modele" style="border:none;background:transparent;font-family:'Nunito',sans-serif">
+            <option value="alternee">Garde alternée 50/50</option>
+            <option value="principale_papa">Résidence principale Papa</option>
+            <option value="principale_mama">Résidence principale Maman</option>
+            <option value="custom">Rythme personnalisé</option>
+          </select>
+        </div></div>
+        <div class="sp-row"><div class="sp-ico" style="background:#F0FDF4">📍</div><div style="flex:1"><div class="sp-lbl">Lieu de remise de l'enfant</div><input class="spi" id="sp-lieu-remise" placeholder="Ex: École Jules Ferry, Gare Part-Dieu..."></div></div>
+        <div class="sp-row"><div class="sp-ico" style="background:#F0FDF4">🕐</div><div style="flex:1"><div class="sp-lbl">Heure de remise (début)</div><input class="spi" id="sp-heure-debut" placeholder="Ex: Vendredi 18h00"></div></div>
+        <div class="sp-row"><div class="sp-ico" style="background:#F0FDF4">🕗</div><div style="flex:1"><div class="sp-lbl">Heure de remise (fin)</div><input class="spi" id="sp-heure-fin" placeholder="Ex: Lundi 8h30"></div></div>
+        <button class="sp-btn-g" onclick="spSaveGarde()">💾 Sauvegarder la garde</button>
+      </div>
+
+      <!-- PENSION -->
+      <div class="sp-sec">
+        <div class="sp-sec-t">Pension alimentaire</div>
+        <div class="sp-row"><div class="sp-ico" style="background:#FFF7ED">💶</div><div style="flex:1"><div class="sp-lbl">Montant mensuel</div><input class="spi" id="sp-pension-montant" placeholder="Ex: 350" type="number" min="0"></div></div>
+        <div class="sp-row"><div class="sp-ico" style="background:#FFF7ED">↕️</div><div style="flex:1"><div class="sp-lbl">Versée par</div>
+          <select class="spi" id="sp-pension-sens" style="border:none;background:transparent;font-family:'Nunito',sans-serif">
+            <option value="papa_vers_mama">Papa → Maman</option>
+            <option value="mama_vers_papa">Maman → Papa</option>
+            <option value="aucune">Aucune</option>
+          </select>
+        </div></div>
+        <div class="sp-row"><div class="sp-ico" style="background:#FFF7ED">📅</div><div style="flex:1"><div class="sp-lbl">Date de versement</div><input class="spi" id="sp-pension-date" placeholder="Ex: le 5 de chaque mois"></div></div>
+        <button class="sp-btn-g" onclick="spSavePension()">💾 Sauvegarder pension</button>
+      </div>
+
+      <!-- AUTRE PARENT -->
       <div class="sp-sec">
         <div class="sp-sec-t">Autre parent</div>
         <div class="sp-row"><div class="sp-ico" style="background:#FDF2F8">👥</div><div style="flex:1"><div class="sp-lbl">Statut</div><div class="sp-val" id="sp-autre-status">⏳ En attente</div></div></div>
-        <button class="sp-btn-b" onclick="spShowInvite()">📲 Code d'invitation</button>
+        <div class="sp-row"><div class="sp-ico" style="background:#FDF2F8">👤</div><div style="flex:1"><div class="sp-lbl">Prénom</div><input class="spi" id="sp-autre-prenom" placeholder="Prénom de l'autre parent"></div></div>
+        <div class="sp-row"><div class="sp-ico" style="background:#FDF2F8">👨‍👩‍👧</div><div style="flex:1"><div class="sp-lbl">Nom de famille</div><input class="spi" id="sp-autre-nom" placeholder="Nom de famille"></div></div>
+        <button class="sp-btn-g" onclick="spSaveAutreParent()">💾 Sauvegarder</button>
+        <button class="sp-btn-b" style="margin-top:6px" onclick="spShowInvite()">📲 Code d'invitation</button>
       </div>
+
+      <!-- COMPTE -->
       <div class="sp-sec">
         <div class="sp-sec-t">Compte</div>
         <button class="sp-btn-r" onclick="spLogout()">🚪 Se déconnecter</button>
       </div>
+
     </div>
   </div>
 
@@ -2545,16 +2593,13 @@ function sbApplyUI(){
   const isPapa=sbProfil.role==='papa';
   const prenom=sbProfil.prenom||'Parent';
   const ini=(prenom[0]||'?').toUpperCase();
-  // Header avatars
   const a1=document.getElementById('hdr-av1');
   const a2=document.getElementById('hdr-av2');
   if(a1){a1.textContent=ini;a1.className='avatar '+(isPapa?'papa':'mama');}
   const autreP=sbEnfant?.autre_parent_prenom||(isPapa?'Maman':'Papa');
   if(a2){a2.textContent=(autreP[0]||'?').toUpperCase();a2.className='avatar '+(isPapa?'mama':'papa');}
-  // Mode switcher label
   const btns=document.querySelectorAll('.mode-btn');
   if(btns[0])btns[0].textContent=(isPapa?'👨 ':'👩 ')+prenom;
-  // Profil overlay
   document.getElementById('sp-av').textContent=ini;
   document.getElementById('sp-nm').textContent=prenom;
   document.getElementById('sp-rl').textContent=isPapa?'👨 Père':'👩 Mère';
@@ -2563,31 +2608,73 @@ function sbApplyUI(){
   document.getElementById('sp-prenom').value=prenom;
   if(sbEnfant){
     document.getElementById('sp-enf-prenom').value=sbEnfant.prenom||'';
+    document.getElementById('sp-enf-nom').value=sbEnfant.nom||'';
     if(sbEnfant.naissance)document.getElementById('sp-enf-dob').value=sbEnfant.naissance;
     document.getElementById('sp-enf-zone').value=sbEnfant.zone||'B';
-    document.getElementById('sp-autre-status').textContent=
-      sbEnfant.autre_parent_id?('✅ '+( sbEnfant.autre_parent_prenom||'Connecté')):'⏳ En attente d\'invitation';
+    document.getElementById('sp-garde-modele').value=sbEnfant.garde_modele||'alternee';
+    document.getElementById('sp-lieu-remise').value=sbEnfant.lieu_remise||'';
+    document.getElementById('sp-heure-debut').value=sbEnfant.heure_remise_debut||'';
+    document.getElementById('sp-heure-fin').value=sbEnfant.heure_remise_fin||'';
+    document.getElementById('sp-pension-montant').value=sbEnfant.pension_montant||'';
+    document.getElementById('sp-pension-sens').value=sbEnfant.pension_sens||'papa_vers_mama';
+    document.getElementById('sp-pension-date').value=sbEnfant.pension_date||'';
+    document.getElementById('sp-autre-prenom').value=sbEnfant.autre_parent_prenom||'';
+    document.getElementById('sp-autre-nom').value=sbEnfant.autre_parent_nom||'';
+    document.getElementById('sp-autre-status').textContent=sbEnfant.autre_parent_id?('✅ '+(sbEnfant.autre_parent_prenom||'Connecté')):'⏳ En attente d\'invitation';
   }
   showToast('👋 Bonjour '+prenom+' !');
 }
 
 // --- Profil overlay ---
-function spOpen(){const el=document.getElementById('sb-profil');el.style.display='flex';}
+function spOpen(){document.getElementById('sb-profil').style.display='flex';}
 function spClose(){document.getElementById('sb-profil').style.display='none';}
+
 async function spSave(){
   const prenom=document.getElementById('sp-prenom').value.trim();
   if(!prenom||!sbUser)return;
   await sbQuery('profils','id=eq.'+sbUser.id,'PATCH',{prenom});
   sbProfil.prenom=prenom;sbApplyUI();showToast('✅ Profil sauvegardé');spClose();
 }
+
 async function spSaveEnfant(){
   if(!sbEnfant)return;
   const prenom=document.getElementById('sp-enf-prenom').value.trim();
+  const nom=document.getElementById('sp-enf-nom').value.trim();
   const naissance=document.getElementById('sp-enf-dob').value;
   const zone=document.getElementById('sp-enf-zone').value;
-  await sbQuery('enfants','id=eq.'+sbEnfant.id,'PATCH',{prenom,naissance,zone});
-  sbEnfant={...sbEnfant,prenom,naissance,zone};
+  await sbQuery('enfants','id=eq.'+sbEnfant.id,'PATCH',{prenom,nom,naissance,zone});
+  sbEnfant={...sbEnfant,prenom,nom,naissance,zone};
   showToast('✅ Enfant sauvegardé');
+}
+
+async function spSaveGarde(){
+  if(!sbEnfant)return;
+  const garde_modele=document.getElementById('sp-garde-modele').value;
+  const lieu_remise=document.getElementById('sp-lieu-remise').value.trim();
+  const heure_remise_debut=document.getElementById('sp-heure-debut').value.trim();
+  const heure_remise_fin=document.getElementById('sp-heure-fin').value.trim();
+  await sbQuery('enfants','id=eq.'+sbEnfant.id,'PATCH',{garde_modele,lieu_remise,heure_remise_debut,heure_remise_fin});
+  sbEnfant={...sbEnfant,garde_modele,lieu_remise,heure_remise_debut,heure_remise_fin};
+  showToast('✅ Garde sauvegardée');
+}
+
+async function spSavePension(){
+  if(!sbEnfant)return;
+  const pension_montant=document.getElementById('sp-pension-montant').value;
+  const pension_sens=document.getElementById('sp-pension-sens').value;
+  const pension_date=document.getElementById('sp-pension-date').value.trim();
+  await sbQuery('enfants','id=eq.'+sbEnfant.id,'PATCH',{pension_montant,pension_sens,pension_date});
+  sbEnfant={...sbEnfant,pension_montant,pension_sens,pension_date};
+  showToast('✅ Pension sauvegardée');
+}
+
+async function spSaveAutreParent(){
+  if(!sbEnfant)return;
+  const autre_parent_prenom=document.getElementById('sp-autre-prenom').value.trim();
+  const autre_parent_nom=document.getElementById('sp-autre-nom').value.trim();
+  await sbQuery('enfants','id=eq.'+sbEnfant.id,'PATCH',{autre_parent_prenom,autre_parent_nom});
+  sbEnfant={...sbEnfant,autre_parent_prenom,autre_parent_nom};
+  showToast('✅ Autre parent sauvegardé');
 }
 function spShowInvite(){
   if(!sbEnfant?.invite_code)return;
