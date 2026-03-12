@@ -2602,6 +2602,34 @@ async function spLogout(){
   sbShowAuth();
 }
 
+// --- Fonctions docs manquantes ---
+function docSubTab(idx, el){
+  const tabs = document.querySelectorAll('.ddtab');
+  tabs.forEach(t => t.classList.remove('active'));
+  if(el) el.classList.add('active');
+  const panels = document.querySelectorAll('.doc-subpanel');
+  panels.forEach((p,i) => p.style.display = i===idx ? 'block' : 'none');
+}
+
+function openPresent(type){
+  const overlay = document.getElementById('present-overlay');
+  if(overlay){ overlay.style.display='flex'; switchCard(type, null); }
+  else { showToast('📲 Document ouvert'); }
+}
+
+function closePresent(){
+  const overlay = document.getElementById('present-overlay');
+  if(overlay) overlay.style.display='none';
+}
+
+function switchCard(type, el){
+  const pills = document.querySelectorAll('.ppill');
+  pills.forEach(p => p.classList.remove('active'));
+  if(el) el.classList.add('active');
+  const cards = document.querySelectorAll('.pcard');
+  cards.forEach(c => c.style.display = c.dataset.type===type ? 'flex' : 'none');
+}
+
 // --- Start ---
 sbInit();
 </script>
