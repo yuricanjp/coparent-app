@@ -2360,11 +2360,16 @@ let sb,sbUser=null,sbProfil=null,sbEnfant=null,authRole=null;
 
 function sbSetup(){
   if(typeof supabase==='undefined'){hideLoading();return;}
-  sb=supabase.createClient(SUPA_URL,SUPA_KEY);
-  sb.auth.getSession().then(({data:{session}})=>{
-    if(session){sbUser=session.user;sbLoadUser();}
-    else{hideLoading();showAuth();}
-  });
+  try{
+    sb=supabase.createClient(SUPA_URL,SUPA_KEY);
+    // Timeout de secours : si rien ne répond en 5s, affiche l'auth
+    const fallback=setTimeout(()=>{hideLoading();showAuth();},5000);
+    sb.auth.getSession().then(({data:{session}})=>{
+      clearTimeout(fallback);
+      if(session){sbUser=session.user;sbLoadUser();}
+      else{hideLoading();showAuth();}
+    }).catch(()=>{clearTimeout(fallback);hideLoading();showAuth();});
+  }catch(e){hideLoading();showAuth();}
 }
 
 function hideLoading(){const el=document.getElementById('loadingScreen');if(el)el.style.display='none';}
