@@ -7,6 +7,56 @@
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Baloo+2:wght@600;700;800&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
+/* AUTH OVERLAY */
+#authOverlay{position:fixed;inset:0;z-index:9999;background:linear-gradient(135deg,#1E3A8A 0%,#4F46E5 50%,#EC4899 100%);display:none;align-items:center;justify-content:center;padding:20px}
+.auth-card{background:white;border-radius:24px;padding:28px 24px;width:100%;max-width:360px;box-shadow:0 30px 80px rgba(0,0,0,0.4);animation:slideUp 0.4s ease}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.auth-logo-wrap{text-align:center;margin-bottom:20px}
+.auth-logo-icon{width:60px;height:60px;background:linear-gradient(135deg,#3B82F6,#EC4899);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 8px}
+.auth-app-name{font-family:'Playfair Display',serif;font-size:24px;color:#1E293B}
+.auth-app-sub{font-size:11px;color:#64748B;font-weight:600}
+.auth-tabs{display:flex;background:#F8FAFC;border-radius:10px;padding:3px;margin-bottom:18px}
+.auth-tab-btn{flex:1;padding:7px;border-radius:8px;font-size:12px;font-weight:800;border:none;background:transparent;color:#64748B;cursor:pointer;font-family:'Nunito',sans-serif;transition:all 0.2s}
+.auth-tab-btn.active{background:white;color:#6366F1;box-shadow:0 2px 8px rgba(0,0,0,0.1)}
+.auth-field{margin-bottom:12px}
+.auth-label{font-size:10px;font-weight:800;color:#64748B;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px}
+.auth-input{width:100%;background:#F8FAFC;border:1.5px solid #E2E8F0;border-radius:10px;padding:10px 12px;font-size:13px;font-family:'Nunito',sans-serif;outline:none;color:#1E293B;transition:border-color 0.2s}
+.auth-input:focus{border-color:#6366F1}
+.auth-btn{width:100%;padding:12px;background:linear-gradient(135deg,#4F46E5,#6366F1);color:white;border:none;border-radius:11px;font-size:13px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;margin-top:6px;transition:all 0.2s}
+.auth-btn:disabled{opacity:0.5;cursor:not-allowed}
+.auth-err{background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;padding:8px 10px;font-size:11px;color:#DC2626;font-weight:700;margin-top:8px;display:none}
+.role-row{display:flex;gap:8px;margin-bottom:12px}
+.role-pick{flex:1;padding:10px 6px;border:2px solid #E2E8F0;border-radius:10px;text-align:center;cursor:pointer;transition:all 0.2s;font-family:'Nunito',sans-serif;background:white}
+.role-pick.p{border-color:#3B82F6;background:#EFF6FF}
+.role-pick.m{border-color:#EC4899;background:#FDF2F8}
+.role-emoji{font-size:20px;display:block}
+.role-lbl{font-size:10px;font-weight:800;color:#64748B}
+#loadingScreen{position:fixed;inset:0;background:linear-gradient(135deg,#1E3A8A,#4F46E5);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:10000}
+.ls-logo{font-size:52px;margin-bottom:12px}
+.ls-title{font-family:'Playfair Display',serif;font-size:26px;color:white}
+.ls-spinner{width:32px;height:32px;border:3px solid rgba(255,255,255,0.2);border-top:3px solid white;border-radius:50%;animation:lspin 1s linear infinite;margin-top:20px}
+@keyframes lspin{to{transform:rotate(360deg)}}
+#inviteBanner{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#1E3A8A,#4F46E5);color:white;border-radius:16px;padding:12px 16px;width:calc(100% - 40px);max-width:360px;z-index:500;box-shadow:0 8px 32px rgba(79,70,229,0.4);display:none}
+.invite-code{font-size:22px;font-weight:900;letter-spacing:4px;text-align:center;padding:8px;background:rgba(255,255,255,0.15);border-radius:10px;margin:8px 0;font-family:monospace}
+#profilOverlay{position:absolute;inset:0;background:#F8FAFC;z-index:100;display:none;flex-direction:column;overflow-y:auto}
+.pov-hero{background:linear-gradient(135deg,#6366F1,#8B5CF6);padding:20px 18px}
+.pov-av{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:900;color:white;border:3px solid rgba(255,255,255,0.4);margin-bottom:8px}
+.pov-nm{font-size:17px;font-weight:900;color:white}
+.pov-rl{font-size:11px;color:rgba(255,255,255,0.8);font-weight:700}
+.pov-body{padding:14px}
+.pov-sec{background:white;border-radius:14px;padding:14px;margin-bottom:10px;border:1px solid #E2E8F0;box-shadow:0 2px 8px rgba(0,0,0,0.04)}
+.pov-sec-title{font-size:10px;font-weight:900;color:#64748B;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+.pov-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #F1F5F9}
+.pov-row:last-child{border-bottom:none}
+.pov-ico{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.pov-lbl{font-size:10px;font-weight:700;color:#64748B}
+.pov-val{font-size:12px;font-weight:800;color:#1E293B}
+.pi{width:100%;border:none;background:transparent;font-size:12px;font-weight:800;color:#1E293B;font-family:'Nunito',sans-serif;outline:none}
+.btn-g{width:100%;padding:10px;background:#10B981;color:white;border:none;border-radius:10px;font-size:12px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;margin-top:8px}
+.btn-r{width:100%;padding:10px;background:white;color:#EF4444;border:1px solid #FECACA;border-radius:10px;font-size:12px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;margin-top:6px}
+.btn-b{width:100%;padding:10px;background:#EFF6FF;color:#3B82F6;border:1px solid #BFDBFE;border-radius:10px;font-size:12px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;margin-top:6px}
+</style>
+<style>
 :root {
   --papa: #3B82F6; --papa-light: #EFF6FF; --papa-mid: #BFDBFE;
   --mama: #EC4899; --mama-light: #FDF2F8; --mama-mid: #FBCFE8;
@@ -392,85 +442,7 @@ body { font-family: 'Nunito', sans-serif; background: #D4DCF0; display: flex; ju
 .info-box { background: var(--accent-light); border: 1px solid var(--papa-mid); border-radius: 10px; padding: 10px 12px; font-size: 11px; color: var(--text-soft); font-weight: 600; margin-bottom: 12px; line-height: 1.5; }
 .info-box strong { color: var(--text); }
 
-/* AUTH OVERLAY */
-#authOverlay {
-  position: fixed; inset: 0; z-index: 9999;
-  background: linear-gradient(135deg, #1E3A8A 0%, #4F46E5 50%, #EC4899 100%);
-  display: flex; align-items: center; justify-content: center; padding: 20px;
-}
-.auth-card {
-  background: white; border-radius: 24px; padding: 28px 24px;
-  width: 100%; max-width: 360px; box-shadow: 0 30px 80px rgba(0,0,0,0.4);
-  animation: slideUp 0.4s ease;
-}
-@keyframes slideUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
-.auth-logo-wrap { text-align: center; margin-bottom: 20px; }
-.auth-logo-icon { width: 60px; height: 60px; background: linear-gradient(135deg,#3B82F6,#EC4899); border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 28px; margin: 0 auto 8px; }
-.auth-app-name { font-family: 'Playfair Display', serif; font-size: 24px; color: #1E293B; }
-.auth-app-sub { font-size: 11px; color: #64748B; font-weight: 600; }
-.auth-tabs { display: flex; background: #F8FAFC; border-radius: 10px; padding: 3px; margin-bottom: 18px; }
-.auth-tab-btn { flex: 1; padding: 7px; border-radius: 8px; font-size: 12px; font-weight: 800; border: none; background: transparent; color: #64748B; cursor: pointer; font-family: 'Nunito', sans-serif; transition: all 0.2s; }
-.auth-tab-btn.active { background: white; color: #6366F1; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-.auth-field { margin-bottom: 12px; }
-.auth-label { font-size: 10px; font-weight: 800; color: #64748B; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 4px; }
-.auth-input { width: 100%; background: #F8FAFC; border: 1.5px solid #E2E8F0; border-radius: 10px; padding: 10px 12px; font-size: 13px; font-family: 'Nunito', sans-serif; outline: none; color: #1E293B; transition: border-color 0.2s; }
-.auth-input:focus { border-color: #6366F1; }
-.auth-btn { width: 100%; padding: 12px; background: linear-gradient(135deg,#4F46E5,#6366F1); color: white; border: none; border-radius: 11px; font-size: 13px; font-weight: 800; cursor: pointer; font-family: 'Nunito', sans-serif; margin-top: 6px; transition: all 0.2s; }
-.auth-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-.auth-err { background: #FEF2F2; border: 1px solid #FECACA; border-radius: 8px; padding: 8px 10px; font-size: 11px; color: #DC2626; font-weight: 700; margin-top: 8px; display: none; }
-.auth-ok { background: #F0FDF4; border: 1px solid #BBF7D0; border-radius: 8px; padding: 8px 10px; font-size: 11px; color: #059669; font-weight: 700; margin-top: 8px; display: none; }
-.role-row { display: flex; gap: 8px; margin-bottom: 12px; }
-.role-pick { flex: 1; padding: 10px 6px; border: 2px solid #E2E8F0; border-radius: 10px; text-align: center; cursor: pointer; transition: all 0.2s; font-family: 'Nunito', sans-serif; background: white; }
-.role-pick.p { border-color: #3B82F6; background: #EFF6FF; }
-.role-pick.m { border-color: #EC4899; background: #FDF2F8; }
-.role-emoji { font-size: 20px; display: block; }
-.role-lbl { font-size: 10px; font-weight: 800; color: #64748B; }
-
-/* INVITE BANNER */
-#inviteBanner {
-  position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-  background: linear-gradient(135deg,#1E3A8A,#4F46E5); color: white;
-  border-radius: 16px; padding: 12px 16px; width: calc(100% - 40px); max-width: 360px;
-  z-index: 500; box-shadow: 0 8px 32px rgba(79,70,229,0.4); display: none;
-  animation: slideUp 0.3s ease;
-}
-.invite-title { font-size: 12px; font-weight: 900; margin-bottom: 4px; }
-.invite-code { font-size: 22px; font-weight: 900; letter-spacing: 4px; text-align: center; padding: 8px; background: rgba(255,255,255,0.15); border-radius: 10px; margin: 8px 0; font-family: monospace; }
-.invite-sub { font-size: 10px; color: rgba(255,255,255,0.75); font-weight: 600; text-align: center; }
-.invite-close { position: absolute; top: 10px; right: 12px; background: none; border: none; color: white; font-size: 18px; cursor: pointer; }
-
-/* LOADING SCREEN */
-#loadingScreen {
-  position: fixed; inset: 0; background: linear-gradient(135deg,#1E3A8A,#4F46E5);
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  z-index: 10000;
-}
-.ls-logo { font-size: 52px; margin-bottom: 12px; }
-.ls-title { font-family: 'Playfair Display', serif; font-size: 26px; color: white; }
-.ls-spinner { width: 32px; height: 32px; border: 3px solid rgba(255,255,255,0.2); border-top: 3px solid white; border-radius: 50%; animation: spin 1s linear infinite; margin-top: 20px; }
-@keyframes spin { to { transform: rotate(360deg); } }
-
-/* PROFIL OVERLAY */
-#profilOverlay {
-  position: absolute; inset: 0; background: var(--bg); z-index: 100;
-  display: none; flex-direction: column; overflow-y: auto;
-}
-.profil-hero-ov { background: linear-gradient(135deg,var(--accent),var(--purple)); padding: 20px 18px; flex-shrink: 0; }
-.profil-av { width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 900; color: white; border: 3px solid rgba(255,255,255,0.4); margin-bottom: 8px; }
-.profil-nm { font-size: 17px; font-weight: 900; color: white; }
-.profil-rl { font-size: 11px; color: rgba(255,255,255,0.8); font-weight: 700; }
-.profil-body { padding: 16px; }
-.profil-section { background: white; border-radius: 14px; padding: 14px; margin-bottom: 12px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); }
-.profil-section-title { font-size: 10px; font-weight: 900; color: var(--text-soft); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
-.profil-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid #F1F5F9; }
-.profil-row:last-child { border-bottom: none; }
-.profil-row-ico { width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; }
-.profil-row-lbl { font-size: 10px; font-weight: 700; color: var(--text-soft); }
-.profil-row-val { font-size: 12px; font-weight: 800; color: var(--text); }
-.pi { width: 100%; border: none; background: transparent; font-size: 12px; font-weight: 800; color: var(--text); font-family: 'Nunito',sans-serif; outline: none; }
-.btn-green { width:100%; padding:10px; background:var(--shared); color:white; border:none; border-radius:10px; font-size:12px; font-weight:800; cursor:pointer; font-family:'Nunito',sans-serif; margin-top:8px; }
-.btn-red { width:100%; padding:10px; background:white; color:#EF4444; border:1px solid #FECACA; border-radius:10px; font-size:12px; font-weight:800; cursor:pointer; font-family:'Nunito',sans-serif; margin-top:6px; }
-.btn-blue { width:100%; padding:10px; background:var(--papa-light); color:var(--papa); border:1px solid var(--papa-mid); border-radius:10px; font-size:12px; font-weight:800; cursor:pointer; font-family:'Nunito',sans-serif; margin-top:6px; }
+/* JUGEMENT IMPORT */
 .jug-step { display:flex; flex-direction:column; align-items:center; gap:2px; font-size:12px; font-weight:800; color:rgba(255,255,255,0.4); min-width:0; }
 .jug-step span { font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:0.3px; white-space:nowrap; }
 .jug-step.active { color:white; }
@@ -507,12 +479,11 @@ body { font-family: 'Nunito', sans-serif; background: #D4DCF0; display: flex; ju
 </style>
 </head>
 <body>
-
 <!-- LOADING -->
 <div id="loadingScreen"><div class="ls-logo">👨‍👩‍👧</div><div class="ls-title">CoParent</div><div class="ls-spinner"></div></div>
 
-<!-- AUTH OVERLAY -->
-<div id="authOverlay" style="display:none">
+<!-- AUTH -->
+<div id="authOverlay">
   <div class="auth-card">
     <div class="auth-logo-wrap">
       <div class="auth-logo-icon">👨‍👩‍👧</div>
@@ -523,14 +494,12 @@ body { font-family: 'Nunito', sans-serif; background: #D4DCF0; display: flex; ju
       <button class="auth-tab-btn active" onclick="authTab('login')">Connexion</button>
       <button class="auth-tab-btn" onclick="authTab('register')">Créer un compte</button>
     </div>
-    <!-- LOGIN -->
     <div id="authLogin">
       <div class="auth-field"><label class="auth-label">Email</label><input type="email" class="auth-input" id="aLoginEmail" placeholder="votre@email.fr"></div>
       <div class="auth-field"><label class="auth-label">Mot de passe</label><input type="password" class="auth-input" id="aLoginPwd" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
       <button class="auth-btn" id="loginBtn" onclick="doLogin()">Se connecter</button>
       <div class="auth-err" id="loginErr"></div>
     </div>
-    <!-- REGISTER -->
     <div id="authRegister" style="display:none">
       <div class="auth-field"><label class="auth-label">Vous êtes</label>
         <div class="role-row">
@@ -540,28 +509,27 @@ body { font-family: 'Nunito', sans-serif; background: #D4DCF0; display: flex; ju
       </div>
       <div class="auth-field"><label class="auth-label">Votre prénom</label><input type="text" class="auth-input" id="aRegPrenom" placeholder="Jean-Philippe"></div>
       <div class="auth-field"><label class="auth-label">Email</label><input type="email" class="auth-input" id="aRegEmail" placeholder="votre@email.fr"></div>
-      <div class="auth-field"><label class="auth-label">Mot de passe</label><input type="password" class="auth-input" id="aRegPwd" placeholder="8 caractères minimum" onkeydown="if(event.key==='Enter')doRegister()"></div>
-      <div class="auth-field" id="codeField" style="display:none">
+      <div class="auth-field"><label class="auth-label">Mot de passe</label><input type="password" class="auth-input" id="aRegPwd" placeholder="8 caractères minimum"></div>
+      <div class="auth-field">
         <label class="auth-label">Code d'invitation (optionnel)</label>
         <input type="text" class="auth-input" id="aRegCode" placeholder="Ex: ABC123" style="letter-spacing:3px;text-transform:uppercase">
         <div style="font-size:10px;color:#64748B;margin-top:3px;font-weight:600">Laissez vide si l'autre parent n'a pas encore de compte</div>
       </div>
       <button class="auth-btn" id="registerBtn" onclick="doRegister()">Créer mon compte</button>
       <div class="auth-err" id="registerErr"></div>
-      <div class="auth-ok" id="registerOk"></div>
     </div>
   </div>
 </div>
 
 <!-- INVITE BANNER -->
 <div id="inviteBanner">
-  <button class="invite-close" onclick="document.getElementById('inviteBanner').style.display='none'">×</button>
-  <div class="invite-title">📲 Invitez l'autre parent</div>
+  <button onclick="document.getElementById('inviteBanner').style.display='none'" style="position:absolute;top:10px;right:12px;background:none;border:none;color:white;font-size:18px;cursor:pointer">×</button>
+  <div style="font-size:12px;font-weight:900;margin-bottom:4px">📲 Invitez l'autre parent</div>
   <div class="invite-code" id="inviteCode">——</div>
-  <div class="invite-sub">Partagez ce code à l'autre parent pour qu'il rejoigne votre espace CoParent</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.75);font-weight:600;text-align:center">Partagez ce code à l'autre parent pour rejoindre votre espace</div>
 </div>
 
-<!-- MODE SWITCHER -->
+<!-- Mode switcher -->
 <div class="mode-switcher">
   <button class="mode-btn active" onclick="setMode('parent-jp')">👨 Jean-Philippe</button>
   <button class="mode-btn" onclick="setMode('parent-marie')">👩 Marie</button>
@@ -583,41 +551,41 @@ body { font-family: 'Nunito', sans-serif; background: #D4DCF0; display: flex; ju
       <div style="display:flex;align-items:center;gap:6px">
         <div style="display:flex"><div class="avatar papa" id="hdrAv1">JP</div><div class="avatar mama" id="hdrAv2">M</div></div>
         <div class="badge-notif">4</div>
-        <div onclick="openProfil()" style="cursor:pointer;font-size:18px;margin-left:4px">⚙️</div>
+        <div onclick="openProfil()" style="cursor:pointer;font-size:16px;margin-left:2px">⚙️</div>
       </div>
     </div>
   </div>
 
   <!-- PROFIL OVERLAY -->
-  <div id="profilOverlay">
-    <div class="profil-hero-ov">
-      <button onclick="closeProfil()" style="background:rgba(255,255,255,0.2);border:none;border-radius:50%;width:30px;height:30px;color:white;font-size:14px;cursor:pointer;margin-bottom:10px">←</button>
-      <div class="profil-av" id="povAv">JP</div>
-      <div class="profil-nm" id="povName">Jean-Philippe</div>
-      <div class="profil-rl" id="povRole">👨 Père</div>
+  <div id="profilOverlay" style="display:none;flex-direction:column">
+    <div class="pov-hero">
+      <button onclick="closeProfil()" style="background:rgba(255,255,255,0.2);border:none;border-radius:50%;width:28px;height:28px;color:white;font-size:13px;cursor:pointer;margin-bottom:10px">←</button>
+      <div class="pov-av" id="povAv">JP</div>
+      <div class="pov-nm" id="povName">Jean-Philippe</div>
+      <div class="pov-rl" id="povRole">👨 Père</div>
     </div>
-    <div class="profil-body">
-      <div class="profil-section">
-        <div class="profil-section-title">Mon profil</div>
-        <div class="profil-row"><div class="profil-row-ico" style="background:#EFF6FF">👤</div><div style="flex:1"><div class="profil-row-lbl">Prénom</div><input class="pi" id="povPrenom" placeholder="Prénom"></div></div>
-        <div class="profil-row"><div class="profil-row-ico" style="background:#F0FDF4">📧</div><div style="flex:1"><div class="profil-row-lbl">Email</div><div class="profil-row-val" id="povEmail">—</div></div></div>
-        <div class="profil-row"><div class="profil-row-ico" style="background:#F5F3FF">👨‍👩‍👧</div><div style="flex:1"><div class="profil-row-lbl">Rôle</div><div class="profil-row-val" id="povRoleVal">—</div></div></div>
-        <button class="btn-green" onclick="saveProfil()">💾 Sauvegarder</button>
+    <div class="pov-body" style="overflow-y:auto;flex:1">
+      <div class="pov-sec">
+        <div class="pov-sec-title">Mon profil</div>
+        <div class="pov-row"><div class="pov-ico" style="background:#EFF6FF">👤</div><div style="flex:1"><div class="pov-lbl">Prénom</div><input class="pi" id="povPrenom" placeholder="Prénom"></div></div>
+        <div class="pov-row"><div class="pov-ico" style="background:#F0FDF4">📧</div><div style="flex:1"><div class="pov-lbl">Email</div><div class="pov-val" id="povEmail">—</div></div></div>
+        <div class="pov-row"><div class="pov-ico" style="background:#F5F3FF">👤</div><div style="flex:1"><div class="pov-lbl">Rôle</div><div class="pov-val" id="povRoleVal">—</div></div></div>
+        <button class="btn-g" onclick="saveProfil()">💾 Sauvegarder</button>
       </div>
-      <div class="profil-section">
-        <div class="profil-section-title">Enfant</div>
-        <div class="profil-row"><div class="profil-row-ico" style="background:#FFFBEB">🧒</div><div style="flex:1"><div class="profil-row-lbl">Prénom</div><input class="pi" id="povEnfantPrenom" placeholder="Prénom enfant" onchange="saveEnfantProfil()"></div></div>
-        <div class="profil-row"><div class="profil-row-ico" style="background:#FFFBEB">📅</div><div style="flex:1"><div class="profil-row-lbl">Date de naissance</div><input type="date" class="pi" id="povEnfantNaissance" onchange="saveEnfantProfil()"></div></div>
-        <div class="profil-row"><div class="profil-row-ico" style="background:#FFFBEB">🏫</div><div style="flex:1"><div class="profil-row-lbl">Zone scolaire</div><select class="pi" id="povEnfantZone" onchange="saveEnfantProfil()" style="border:none;background:transparent;font-family:'Nunito',sans-serif"><option value="A">Zone A</option><option value="B">Zone B</option><option value="C">Zone C</option></select></div></div>
+      <div class="pov-sec">
+        <div class="pov-sec-title">Enfant</div>
+        <div class="pov-row"><div class="pov-ico" style="background:#FFFBEB">🧒</div><div style="flex:1"><div class="pov-lbl">Prénom</div><input class="pi" id="povEnfantPrenom" placeholder="Prénom" onchange="saveEnfantProfil()"></div></div>
+        <div class="pov-row"><div class="pov-ico" style="background:#FFFBEB">📅</div><div style="flex:1"><div class="pov-lbl">Naissance</div><input type="date" class="pi" id="povEnfantNaissance" onchange="saveEnfantProfil()"></div></div>
+        <div class="pov-row"><div class="pov-ico" style="background:#FFFBEB">🏫</div><div style="flex:1"><div class="pov-lbl">Zone scolaire</div><select class="pi" id="povEnfantZone" onchange="saveEnfantProfil()" style="border:none;background:transparent;font-family:'Nunito',sans-serif"><option value="A">Zone A</option><option value="B" selected>Zone B</option><option value="C">Zone C</option></select></div></div>
       </div>
-      <div class="profil-section">
-        <div class="profil-section-title">Autre parent</div>
-        <div class="profil-row"><div class="profil-row-ico" style="background:#FDF2F8">👥</div><div style="flex:1"><div class="profil-row-lbl">Statut</div><div class="profil-row-val" id="povAutreStatus">En attente</div></div></div>
-        <button class="btn-blue" onclick="showInviteCode()">📲 Voir le code d'invitation</button>
+      <div class="pov-sec">
+        <div class="pov-sec-title">Autre parent</div>
+        <div class="pov-row"><div class="pov-ico" style="background:#FDF2F8">👥</div><div style="flex:1"><div class="pov-lbl">Statut</div><div class="pov-val" id="povAutreStatus">En attente</div></div></div>
+        <button class="btn-b" onclick="showInviteCode()">📲 Code d'invitation</button>
       </div>
-      <div class="profil-section">
-        <div class="profil-section-title">Compte</div>
-        <button class="btn-red" onclick="doLogout()">🚪 Se déconnecter</button>
+      <div class="pov-sec">
+        <div class="pov-sec-title">Compte</div>
+        <button class="btn-r" onclick="doLogout()">🚪 Se déconnecter</button>
       </div>
     </div>
   </div>
@@ -1921,252 +1889,9 @@ function copySemAtoB(){
   showToast('✅ Semaine A copiée vers B — modifiez les différences');
 }
 
-// ===== SUPABASE BACKEND =====
-const SUPA_URL = 'https://acwozhheidsjelchmnuq.supabase.co';
-const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFjd296aGhlaWRzamVsY2htbnVxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2NDIwMzQsImV4cCI6MjA4ODIxODAzNH0.7s-bOJKcaFY4Mfl3yPpdDf38g-vF0T4aiQbXJta3GXM';
-const sb = supabase.createClient(SUPA_URL, SUPA_KEY);
+renderWeek();
 
-let sbUser = null, sbProfil = null, sbEnfant = null;
-let authRole = null;
-
-// ===== INIT =====
-async function sbInit() {
-  const { data: { session } } = await sb.auth.getSession();
-  if (session) {
-    sbUser = session.user;
-    await sbLoadUser();
-  } else {
-    hideLoading();
-    showAuth();
-  }
-}
-
-function hideLoading() {
-  document.getElementById('loadingScreen').style.display = 'none';
-}
-function showAuth() {
-  document.getElementById('authOverlay').style.display = 'flex';
-}
-function hideAuth() {
-  document.getElementById('authOverlay').style.display = 'none';
-}
-
-// ===== AUTH TABS =====
-function authTab(t) {
-  document.getElementById('authLogin').style.display = t==='login'?'block':'none';
-  document.getElementById('authRegister').style.display = t==='register'?'block':'none';
-  document.querySelectorAll('.auth-tab-btn').forEach((b,i)=>b.classList.toggle('active',(i===0&&t==='login')||(i===1&&t==='register')));
-  if(t==='register') document.getElementById('codeField').style.display='block';
-}
-
-function pickRole(r) {
-  authRole = r;
-  document.getElementById('rPapa').className = 'role-pick' + (r==='papa'?' p':'');
-  document.getElementById('rMama').className = 'role-pick' + (r==='mama'?' m':'');
-}
-
-// ===== LOGIN =====
-async function doLogin() {
-  const email = document.getElementById('aLoginEmail').value.trim();
-  const pwd = document.getElementById('aLoginPwd').value;
-  const err = document.getElementById('loginErr');
-  const btn = document.getElementById('loginBtn');
-  err.style.display='none';
-  if(!email||!pwd){err.textContent='Remplissez tous les champs.';err.style.display='block';return;}
-  btn.disabled=true; btn.textContent='Connexion…';
-  const {data,error} = await sb.auth.signInWithPassword({email,password:pwd});
-  if(error){err.textContent='Email ou mot de passe incorrect.';err.style.display='block';btn.disabled=false;btn.textContent='Se connecter';return;}
-  sbUser = data.user;
-  await sbLoadUser();
-}
-
-// ===== REGISTER =====
-async function doRegister() {
-  const prenom = document.getElementById('aRegPrenom').value.trim();
-  const email = document.getElementById('aRegEmail').value.trim();
-  const pwd = document.getElementById('aRegPwd').value;
-  const code = document.getElementById('aRegCode').value.trim().toUpperCase();
-  const err = document.getElementById('registerErr');
-  const ok = document.getElementById('registerOk');
-  const btn = document.getElementById('registerBtn');
-  err.style.display='none'; ok.style.display='none';
-  if(!authRole){err.textContent='Choisissez votre rôle.';err.style.display='block';return;}
-  if(!prenom||!email||!pwd){err.textContent='Remplissez tous les champs.';err.style.display='block';return;}
-  if(pwd.length<6){err.textContent='Mot de passe trop court (6 min).';err.style.display='block';return;}
-  btn.disabled=true; btn.textContent='Création…';
-
-  const {data,error} = await sb.auth.signUp({email,password:pwd,options:{data:{prenom,role:authRole}}});
-  if(error){err.textContent=error.message;err.style.display='block';btn.disabled=false;btn.textContent='Créer mon compte';return;}
-  sbUser = data.user;
-
-  // Upsert profil
-  await sb.from('profils').upsert({id:sbUser.id,email,prenom,role:authRole});
-
-  // Générer code invitation unique
-  const invCode = Math.random().toString(36).substring(2,8).toUpperCase();
-
-  // Créer enfant avec code invitation
-  const {data:enfant} = await sb.from('enfants').insert({
-    parent_id: sbUser.id,
-    prenom: '', nom: '', zone: 'B', garde_modele: 'alternee',
-    invite_code: invCode,
-    autre_parent_id: null
-  }).select().single();
-  sbEnfant = enfant;
-  sbProfil = {id:sbUser.id,email,prenom,role:authRole};
-
-  // Si code d'invitation saisi → rejoindre l'enfant existant
-  if(code) {
-    const {data:enfantExist} = await sb.from('enfants').select('*').eq('invite_code',code).single();
-    if(enfantExist) {
-      await sb.from('enfants').update({autre_parent_id:sbUser.id, autre_parent_prenom:prenom}).eq('id',enfantExist.id);
-      await sb.from('enfants').delete().eq('id',enfant.id);
-      sbEnfant = {...enfantExist, autre_parent_id:sbUser.id, autre_parent_prenom:prenom};
-      showToast('✅ Connecté avec l\'autre parent !');
-    }
-  }
-
-  btn.disabled=false; btn.textContent='Créer mon compte';
-  hideAuth();
-  hideLoading();
-  sbApplyToUI();
-}
-
-// ===== LOAD USER =====
-async function sbLoadUser() {
-  const {data:profil} = await sb.from('profils').select('*').eq('id',sbUser.id).single();
-  if(!profil) {
-    // Créer profil depuis metadata
-    const meta = sbUser.user_metadata||{};
-    await sb.from('profils').upsert({id:sbUser.id,email:sbUser.email,prenom:meta.prenom||'Parent',role:meta.role||'papa'});
-    sbProfil = {id:sbUser.id,email:sbUser.email,prenom:meta.prenom||'Parent',role:meta.role||'papa'};
-  } else {
-    sbProfil = profil;
-  }
-
-  // Cherche l'enfant (en tant que parent principal OU autre parent)
-  let {data:enfant} = await sb.from('enfants').select('*').eq('parent_id',sbUser.id).single();
-  if(!enfant) {
-    const {data:enfant2} = await sb.from('enfants').select('*').eq('autre_parent_id',sbUser.id).single();
-    enfant = enfant2;
-  }
-
-  if(!enfant) {
-    // Créer enfant vide
-    const invCode = Math.random().toString(36).substring(2,8).toUpperCase();
-    const {data:newEnfant} = await sb.from('enfants').insert({parent_id:sbUser.id,prenom:'',nom:'',zone:'B',garde_modele:'alternee',invite_code:invCode}).select().single();
-    sbEnfant = newEnfant;
-  } else {
-    sbEnfant = enfant;
-  }
-
-  hideLoading();
-  hideAuth();
-  sbApplyToUI();
-}
-
-// ===== APPLY TO UI =====
-function sbApplyToUI() {
-  if(!sbProfil) return;
-  const isPapa = sbProfil.role==='papa';
-  const prenom = sbProfil.prenom||'Parent';
-  const initial = prenom[0].toUpperCase();
-
-  // Update mode switcher labels
-  const btns = document.querySelectorAll('.mode-btn');
-  if(btns[0]) btns[0].textContent = (isPapa?'👨 ':'👩 ') + prenom;
-
-  // Update header avatars
-  const av1 = document.getElementById('hdrAv1');
-  const av2 = document.getElementById('hdrAv2');
-  if(av1) { av1.textContent=initial; av1.className='avatar '+(isPapa?'papa':'mama'); }
-
-  // Autres parent infos
-  const autrePrenom = sbEnfant?.autre_parent_prenom || (isPapa?'Maman':'Papa');
-  if(av2) { av2.textContent=autrePrenom[0]?.toUpperCase()||'?'; av2.className='avatar '+(isPapa?'mama':'papa'); }
-
-  // Profil overlay
-  document.getElementById('povAv').textContent=initial;
-  document.getElementById('povName').textContent=prenom;
-  document.getElementById('povRole').textContent=isPapa?'👨 Père':'👩 Mère';
-  document.getElementById('povEmail').textContent=sbProfil.email||'';
-  document.getElementById('povRoleVal').textContent=isPapa?'Père':'Mère';
-  document.getElementById('povPrenom').value=prenom;
-  if(sbEnfant) {
-    document.getElementById('povEnfantPrenom').value=sbEnfant.prenom||'';
-    document.getElementById('povEnfantNaissance').value=sbEnfant.naissance||'';
-    document.getElementById('povEnfantZone').value=sbEnfant.zone||'B';
-    document.getElementById('povAutreStatus').textContent=sbEnfant.autre_parent_id?('✅ Connecté — '+(sbEnfant.autre_parent_prenom||'Autre parent')):'⏳ En attente d\'invitation';
-  }
-
-  // Calendrier enfant nom
-  const enfantNom = sbEnfant?.prenom || 'Enfant';
-  const childGreeting = document.querySelector('.child-greeting');
-  if(childGreeting) childGreeting.textContent = 'Bonjour ' + enfantNom + ' ! 👋';
-
-  showToast('👋 Bonjour ' + prenom + ' !');
-}
-
-// ===== PROFIL OVERLAY =====
-function openProfil() {
-  const ov = document.getElementById('profilOverlay');
-  ov.style.display='flex'; ov.style.flexDirection='column';
-}
-function closeProfil() {
-  document.getElementById('profilOverlay').style.display='none';
-}
-
-async function saveProfil() {
-  const prenom = document.getElementById('povPrenom').value.trim();
-  if(!prenom||!sbUser) return;
-  await sb.from('profils').update({prenom}).eq('id',sbUser.id);
-  sbProfil.prenom = prenom;
-  sbApplyToUI();
-  showToast('✅ Profil sauvegardé');
-  closeProfil();
-}
-
-async function saveEnfantProfil() {
-  if(!sbEnfant) return;
-  const prenom = document.getElementById('povEnfantPrenom').value.trim();
-  const naissance = document.getElementById('povEnfantNaissance').value;
-  const zone = document.getElementById('povEnfantZone').value;
-  await sb.from('enfants').update({prenom,naissance,zone}).eq('id',sbEnfant.id);
-  sbEnfant = {...sbEnfant,prenom,naissance,zone};
-  sbApplyToUI();
-  showToast('✅ Infos enfant sauvegardées');
-}
-
-function showInviteCode() {
-  if(!sbEnfant?.invite_code) return;
-  document.getElementById('inviteCode').textContent = sbEnfant.invite_code;
-  document.getElementById('inviteBanner').style.display='block';
-  closeProfil();
-}
-
-// ===== LOGOUT =====
-async function doLogout() {
-  await sb.auth.signOut();
-  sbUser=null; sbProfil=null; sbEnfant=null;
-  document.getElementById('profilOverlay').style.display='none';
-  showAuth();
-  showToast('👋 Déconnecté');
-}
-
-// ===== SAVE GARDE MODEL TO DB =====
-async function sbSaveGardeModel(model) {
-  if(!sbEnfant) return;
-  await sb.from('enfants').update({garde_modele:model}).eq('id',sbEnfant.id);
-  sbEnfant.garde_modele = model;
-}
-
-// ===== START =====
-if(typeof supabase !== 'undefined') {
-  sbInit();
-} else {
-  hideLoading();
-}
-
+function setPaint(p){
   paint=p;
   document.querySelectorAll('.who-btn').forEach(b=>{b.className=b.id==='wb-'+p?'who-btn act '+p:'who-btn '+b.id.replace('wb-','');});
 }
@@ -2627,6 +2352,162 @@ function applyJugementToApp(){
     `;
   }
 }
+
+// ===== SUPABASE =====
+const SUPA_URL='https://acwozhheidsjelchmnuq.supabase.co';
+const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFjd296aGhlaWRzamVsY2htbnVxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2NDIwMzQsImV4cCI6MjA4ODIxODAzNH0.7s-bOJKcaFY4Mfl3yPpdDf38g-vF0T4aiQbXJta3GXM';
+let sb,sbUser=null,sbProfil=null,sbEnfant=null,authRole=null;
+
+function sbSetup(){
+  if(typeof supabase==='undefined'){hideLoading();return;}
+  sb=supabase.createClient(SUPA_URL,SUPA_KEY);
+  sb.auth.getSession().then(({data:{session}})=>{
+    if(session){sbUser=session.user;sbLoadUser();}
+    else{hideLoading();showAuth();}
+  });
+}
+
+function hideLoading(){const el=document.getElementById('loadingScreen');if(el)el.style.display='none';}
+function showAuth(){const el=document.getElementById('authOverlay');if(el)el.style.display='flex';}
+function hideAuth(){const el=document.getElementById('authOverlay');if(el)el.style.display='none';}
+
+function authTab(t){
+  document.getElementById('authLogin').style.display=t==='login'?'block':'none';
+  document.getElementById('authRegister').style.display=t==='register'?'block':'none';
+  document.querySelectorAll('.auth-tab-btn').forEach((b,i)=>b.classList.toggle('active',(i===0&&t==='login')||(i===1&&t==='register')));
+}
+function pickRole(r){
+  authRole=r;
+  document.getElementById('rPapa').className='role-pick'+(r==='papa'?' p':'');
+  document.getElementById('rMama').className='role-pick'+(r==='mama'?' m':'');
+}
+
+async function doLogin(){
+  const email=document.getElementById('aLoginEmail').value.trim();
+  const pwd=document.getElementById('aLoginPwd').value;
+  const err=document.getElementById('loginErr');
+  const btn=document.getElementById('loginBtn');
+  err.style.display='none';
+  if(!email||!pwd){err.textContent='Remplissez tous les champs.';err.style.display='block';return;}
+  btn.disabled=true;btn.textContent='Connexion…';
+  const {data,error}=await sb.auth.signInWithPassword({email,password:pwd});
+  if(error){err.textContent='Email ou mot de passe incorrect.';err.style.display='block';btn.disabled=false;btn.textContent='Se connecter';return;}
+  sbUser=data.user;
+  await sbLoadUser();
+}
+
+async function doRegister(){
+  const prenom=document.getElementById('aRegPrenom').value.trim();
+  const email=document.getElementById('aRegEmail').value.trim();
+  const pwd=document.getElementById('aRegPwd').value;
+  const code=document.getElementById('aRegCode').value.trim().toUpperCase();
+  const err=document.getElementById('registerErr');
+  const btn=document.getElementById('registerBtn');
+  err.style.display='none';
+  if(!authRole){err.textContent='Choisissez votre rôle.';err.style.display='block';return;}
+  if(!prenom||!email||!pwd){err.textContent='Remplissez tous les champs.';err.style.display='block';return;}
+  if(pwd.length<6){err.textContent='Mot de passe trop court (6 min).';err.style.display='block';return;}
+  btn.disabled=true;btn.textContent='Création…';
+  const {data,error}=await sb.auth.signUp({email,password:pwd,options:{data:{prenom,role:authRole}}});
+  if(error){err.textContent=error.message;err.style.display='block';btn.disabled=false;btn.textContent='Créer mon compte';return;}
+  sbUser=data.user;
+  await sb.from('profils').upsert({id:sbUser.id,email,prenom,role:authRole});
+  const invCode=Math.random().toString(36).substring(2,8).toUpperCase();
+  let enfant=null;
+  if(code){
+    const {data:ef}=await sb.from('enfants').select('*').eq('invite_code',code).single();
+    if(ef){await sb.from('enfants').update({autre_parent_id:sbUser.id,autre_parent_prenom:prenom}).eq('id',ef.id);enfant={...ef,autre_parent_id:sbUser.id};}
+  }
+  if(!enfant){
+    const {data:ne}=await sb.from('enfants').insert({parent_id:sbUser.id,prenom:'',nom:'',zone:'B',garde_modele:'alternee',invite_code:invCode}).select().single();
+    enfant=ne;
+  }
+  sbEnfant=enfant;
+  sbProfil={id:sbUser.id,email,prenom,role:authRole};
+  btn.disabled=false;btn.textContent='Créer mon compte';
+  hideAuth();sbApplyToUI();
+}
+
+async function sbLoadUser(){
+  try{
+    let{data:profil}=await sb.from('profils').select('*').eq('id',sbUser.id).single();
+    if(!profil){
+      const meta=sbUser.user_metadata||{};
+      await sb.from('profils').upsert({id:sbUser.id,email:sbUser.email,prenom:meta.prenom||'Parent',role:meta.role||'papa'});
+      profil={id:sbUser.id,email:sbUser.email,prenom:meta.prenom||'Parent',role:meta.role||'papa'};
+    }
+    sbProfil=profil;
+    let{data:enfant}=await sb.from('enfants').select('*').eq('parent_id',sbUser.id).single();
+    if(!enfant){const{data:e2}=await sb.from('enfants').select('*').eq('autre_parent_id',sbUser.id).single();enfant=e2;}
+    if(!enfant){
+      const inv=Math.random().toString(36).substring(2,8).toUpperCase();
+      const{data:ne}=await sb.from('enfants').insert({parent_id:sbUser.id,prenom:'',nom:'',zone:'B',garde_modele:'alternee',invite_code:inv}).select().single();
+      enfant=ne;
+    }
+    sbEnfant=enfant;
+  }catch(e){console.error('sbLoadUser error',e);}
+  hideLoading();hideAuth();sbApplyToUI();
+}
+
+function sbApplyToUI(){
+  if(!sbProfil)return;
+  const isPapa=sbProfil.role==='papa';
+  const prenom=sbProfil.prenom||'Parent';
+  const initial=prenom[0]?.toUpperCase()||'?';
+  const av1=document.getElementById('hdrAv1');
+  const av2=document.getElementById('hdrAv2');
+  if(av1){av1.textContent=initial;av1.className='avatar '+(isPapa?'papa':'mama');}
+  const autrePrenom=sbEnfant?.autre_parent_prenom||(isPapa?'Maman':'Papa');
+  if(av2){av2.textContent=autrePrenom[0]?.toUpperCase()||'?';av2.className='avatar '+(isPapa?'mama':'papa');}
+  const btns=document.querySelectorAll('.mode-btn');
+  if(btns[0])btns[0].textContent=(isPapa?'👨 ':'👩 ')+prenom;
+  document.getElementById('povAv').textContent=initial;
+  document.getElementById('povName').textContent=prenom;
+  document.getElementById('povRole').textContent=isPapa?'👨 Père':'👩 Mère';
+  document.getElementById('povEmail').textContent=sbProfil.email||'';
+  document.getElementById('povRoleVal').textContent=isPapa?'Père':'Mère';
+  document.getElementById('povPrenom').value=prenom;
+  if(sbEnfant){
+    document.getElementById('povEnfantPrenom').value=sbEnfant.prenom||'';
+    if(sbEnfant.naissance)document.getElementById('povEnfantNaissance').value=sbEnfant.naissance;
+    document.getElementById('povEnfantZone').value=sbEnfant.zone||'B';
+    document.getElementById('povAutreStatus').textContent=sbEnfant.autre_parent_id?('✅ Connecté — '+(sbEnfant.autre_parent_prenom||'Autre parent')):'⏳ En attente';
+  }
+  showToast('👋 Bonjour '+prenom+' !');
+}
+
+function openProfil(){const ov=document.getElementById('profilOverlay');ov.style.display='flex';}
+function closeProfil(){document.getElementById('profilOverlay').style.display='none';}
+
+async function saveProfil(){
+  const prenom=document.getElementById('povPrenom').value.trim();
+  if(!prenom||!sbUser)return;
+  await sb.from('profils').update({prenom}).eq('id',sbUser.id);
+  sbProfil.prenom=prenom;sbApplyToUI();showToast('✅ Profil sauvegardé');closeProfil();
+}
+async function saveEnfantProfil(){
+  if(!sbEnfant)return;
+  const prenom=document.getElementById('povEnfantPrenom').value.trim();
+  const naissance=document.getElementById('povEnfantNaissance').value;
+  const zone=document.getElementById('povEnfantZone').value;
+  await sb.from('enfants').update({prenom,naissance,zone}).eq('id',sbEnfant.id);
+  sbEnfant={...sbEnfant,prenom,naissance,zone};showToast('✅ Enfant sauvegardé');
+}
+function showInviteCode(){
+  if(!sbEnfant?.invite_code)return;
+  document.getElementById('inviteCode').textContent=sbEnfant.invite_code;
+  document.getElementById('inviteBanner').style.display='block';
+  closeProfil();
+}
+async function doLogout(){
+  await sb.auth.signOut();
+  sbUser=null;sbProfil=null;sbEnfant=null;
+  document.getElementById('profilOverlay').style.display='none';
+  showAuth();
+}
+
+// Start
+document.addEventListener('DOMContentLoaded',()=>sbSetup());
 </script>
 </body>
 </html>
