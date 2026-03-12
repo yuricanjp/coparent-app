@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>CoParent</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Baloo+2:wght@600;700;800&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -2368,21 +2368,79 @@ function applyJugementToApp(){
 
 <script>
 // ============================================================
-// SUPABASE AUTH & DATA
+// SUPABASE — PURE FETCH, ZERO CDN DEPENDENCY
 // ============================================================
 const SB_URL='https://acwozhheidsjelchmnuq.supabase.co';
 const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFjd296aGhlaWRzamVsY2htbnVxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2NDIwMzQsImV4cCI6MjA4ODIxODAzNH0.7s-bOJKcaFY4Mfl3yPpdDf38g-vF0T4aiQbXJta3GXM';
-let sb=null, sbUser=null, sbProfil=null, sbEnfant=null, sbRole=null;
+let sbUser=null, sbProfil=null, sbEnfant=null, sbRole=null;
+let sbToken=null, sbRefreshToken=null;
+
+// ---- FETCH HELPERS ----
+async function sbFetch(path, method='GET', body=null, useToken=true){
+  const headers={'Content-Type':'application/json','apikey':SB_KEY};
+  if(useToken && sbToken) headers['Authorization']='Bearer '+sbToken;
+  else headers['Authorization']='Bearer '+SB_KEY;
+  const opts={method,headers};
+  if(body) opts.body=JSON.stringify(body);
+  const r=await fetch(SB_URL+path,opts);
+  const text=await r.text();
+  try{return{ok:r.ok,status:r.status,data:text?JSON.parse(text):null};}
+  catch{return{ok:r.ok,status:r.status,data:text};}
+}
+
+async function sbQuery(table, filter='', method='GET', body=null){
+  return sbFetch('/rest/v1/'+table+(filter?'?'+filter:''), method, body);
+}
+
+// ---- AUTH ----
+async function sbSignIn(email,pwd){
+  return sbFetch('/auth/v1/token?grant_type=password','POST',{email,password:pwd},false);
+}
+async function sbSignUp(email,pwd,meta){
+  return sbFetch('/auth/v1/signup','POST',{email,password:pwd,data:meta},false);
+}
+async function sbGetSession(){
+  const stored=localStorage.getItem('sb_session');
+  if(!stored) return null;
+  try{
+    const s=JSON.parse(stored);
+    if(s.expires_at && Date.now()/1000 > s.expires_at-60){
+      // Refresh
+      const r=await sbFetch('/auth/v1/token?grant_type=refresh_token','POST',{refresh_token:s.refresh_token},false);
+      if(r.ok && r.data?.access_token){
+        r.data.expires_at=Math.floor(Date.now()/1000)+r.data.expires_in;
+        localStorage.setItem('sb_session',JSON.stringify(r.data));
+        return r.data;
+      }
+      localStorage.removeItem('sb_session');
+      return null;
+    }
+    return s;
+  }catch{localStorage.removeItem('sb_session');return null;}
+}
+async function sbSignOut(){
+  await sbFetch('/auth/v1/logout','POST');
+  localStorage.removeItem('sb_session');
+  sbToken=null; sbUser=null;
+}
 
 // --- Init ---
-function sbInit(){
-  sb=supabase.createClient(SB_URL,SB_KEY);
-  const fallback=setTimeout(()=>{sbHideLoading();sbShowAuth();},6000);
-  sb.auth.getSession().then(({data:{session}})=>{
-    clearTimeout(fallback);
-    if(session){sbUser=session.user;sbLoadUser();}
-    else{sbHideLoading();sbShowAuth();}
-  }).catch(()=>{clearTimeout(fallback);sbHideLoading();sbShowAuth();});
+async function sbInit(){
+  sbHideLoading();
+  try{
+    const session=await sbGetSession();
+    if(session && session.access_token){
+      sbToken=session.access_token;
+      const u=session.user||{};
+      sbUser={id:u.id||session.sub,email:u.email,user_metadata:u.user_metadata||{}};
+      await sbLoadUser();
+    }else{
+      sbShowAuth();
+    }
+  }catch(e){
+    console.error('sbInit:',e);
+    sbShowAuth();
+  }
 }
 
 function sbHideLoading(){const el=document.getElementById('sb-loading');if(el)el.style.display='none';}
@@ -2541,24 +2599,14 @@ function spShowInvite(){
   spClose();
 }
 async function spLogout(){
-  await sb.auth.signOut();
-  sbUser=null;sbProfil=null;sbEnfant=null;
+  await sbSignOut();
+  sbProfil=null;sbEnfant=null;
   document.getElementById('sb-profil').style.display='none';
   sbShowAuth();
 }
 
 // --- Start ---
-if(typeof supabase!=='undefined'){
-  sbInit();
-}else{
-  // Retry si le CDN est lent
-  let attempts=0;
-  const t=setInterval(()=>{
-    attempts++;
-    if(typeof supabase!=='undefined'){clearInterval(t);sbInit();}
-    else if(attempts>15){clearInterval(t);sbHideLoading();sbShowAuth();}
-  },400);
-}
+sbInit();
 </script>
 </body>
 </html>
